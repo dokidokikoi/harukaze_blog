@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.harukaze.blog.app.dao.ArticleDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.harukaze.blog.app.entity.ArticleEntity" id="articleMap">
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="summary" column="summary"/>
+        <result property="cover" column="cover"/>
+        <result property="veiwCounts" column="veiw_counts"/>
+        <result property="commentCounts" column="comment_counts"/>
+        <result property="weight" column="weight"/>
+        <result property="stats" column="stats"/>
+        <result property="createDate" column="create_date"/>
+        <result property="updateDate" column="update_date"/>
+        <result property="authorId" column="author_id"/>
+        <result property="bodyId" column="body_id"/>
+        <result property="categoryId" column="category_id"/>
+    </resultMap>
+
+
+</mapper>
