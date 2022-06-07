@@ -1,5 +1,6 @@
 package com.harukaze.blog.app.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -22,7 +23,7 @@ public class RoleEntity implements Serializable {
 	/**
 	 * 
 	 */
-	@TableId
+	@TableId(type = IdType.AUTO)
 	private Long id;
 	/**
 	 * 角色名
@@ -31,6 +32,6 @@ public class RoleEntity implements Serializable {
 	/**
 	 * 角色描述
 	 */
-	private String desc;
+	private String roleDesc;
 
 }

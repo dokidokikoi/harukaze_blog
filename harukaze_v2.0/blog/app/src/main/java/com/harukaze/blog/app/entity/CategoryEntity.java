@@ -1,5 +1,6 @@
 package com.harukaze.blog.app.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -22,7 +23,7 @@ public class CategoryEntity implements Serializable {
 	/**
 	 * 
 	 */
-	@TableId
+	@TableId(type = IdType.AUTO)
 	private Long id;
 	/**
 	 * 头像
@@ -35,6 +36,6 @@ public class CategoryEntity implements Serializable {
 	/**
 	 * 描述
 	 */
-	private String desc;
+	private String categoryDesc;
 
 }

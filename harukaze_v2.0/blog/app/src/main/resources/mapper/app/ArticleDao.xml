@@ -9,10 +9,10 @@
         <result property="title" column="title"/>
         <result property="summary" column="summary"/>
         <result property="cover" column="cover"/>
-        <result property="veiwCounts" column="veiw_counts"/>
+        <result property="viewCounts" column="veiw_counts"/>
         <result property="commentCounts" column="comment_counts"/>
         <result property="weight" column="weight"/>
-        <result property="stats" column="stats"/>
+        <result property="state" column="stats"/>
         <result property="createDate" column="create_date"/>
         <result property="updateDate" column="update_date"/>
         <result property="authorId" column="author_id"/>
@@ -20,5 +20,36 @@
         <result property="categoryId" column="category_id"/>
     </resultMap>
 
-
+    <select id="selectArticleList" resultType="articleEntity">
+        SELECT DISTINCT a.id, a.`title`, a.`author_id`, a.`body_id`, a.`summary`, a.`cover`, a.`view_counts`, a.`comment_counts`, a.`weight`, a.`state`, a.`update_date`, a.`create_date`, a.`category_id`
+        FROM hk_article a, hk_category c, hk_tag t, hk_article_tag `at`
+        WHERE
+        t.id = `at`.`tag_id` AND `at`.`article_id` = a.id AND c.`id` = a.category_id
+        <if test="tags != null and tags.size() > 0">
+            AND t.id IN
+            <foreach collection="tags" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="categoryId != null">
+            AND a.`category_id` = #{categoryId}
+        </if>
+        <if test="key != null">
+            AND (
+            a.title LIKE CONCAT('%',#{key},'%')
+            OR c.`category_name` LIKE CONCAT('%',#{key},'%')
+            OR t.`tag_name` LIKE CONCAT('%',#{key},'%'))
+        </if>
+        ORDER BY
+        <if test="time != null">
+            create_date #{time},
+        </if>
+        <if test="view != null">
+            view_counts #{view}
+        </if>
+        <if test="comment != null">
+            comment_counts #{comment}
+        </if>
+        weight desc
+    </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.harukaze.blog.app.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -22,7 +23,7 @@ public class ArticleEntity implements Serializable {
 	/**
 	 * 
 	 */
-	@TableId
+	@TableId(type = IdType.AUTO)
 	private Long id;
 	/**
 	 * 标题
@@ -39,7 +40,7 @@ public class ArticleEntity implements Serializable {
 	/**
 	 * 浏览量
 	 */
-	private Integer veiwCounts;
+	private Integer viewCounts;
 	/**
 	 * 评论数
 	 */
@@ -51,7 +52,7 @@ public class ArticleEntity implements Serializable {
 	/**
 	 * 状态
 	 */
-	private Integer stats;
+	private Integer state;
 	/**
 	 * 创建时间
 	 */

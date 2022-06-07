@@ -1,8 +1,13 @@
 package com.harukaze.blog.app.dao;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.harukaze.blog.app.entity.ArticleEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 
@@ -13,5 +18,13 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface ArticleDao extends BaseMapper<ArticleEntity> {
-	
+
+    IPage<ArticleEntity> selectArticleList(Page<ArticleEntity> page,
+                                           @Param("key") String key,
+                                           @Param("categoryId") Long categoryId,
+                                           @Param("tags") List<Long> tags,
+                                           @Param("time") String time,
+                                           @Param("view") String view,
+                                           @Param("comment") String comment);
+
 }

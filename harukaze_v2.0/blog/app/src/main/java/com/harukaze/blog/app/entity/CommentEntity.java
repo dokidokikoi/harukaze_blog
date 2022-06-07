@@ -1,5 +1,6 @@
 package com.harukaze.blog.app.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -22,7 +23,7 @@ public class CommentEntity implements Serializable {
 	/**
 	 * 
 	 */
-	@TableId
+	@TableId(type = IdType.AUTO)
 	private Long id;
 	/**
 	 * 评论内容
@@ -39,7 +40,7 @@ public class CommentEntity implements Serializable {
 	/**
 	 * 状态
 	 */
-	private Integer stats;
+	private Integer state;
 	/**
 	 * 评论文章id
 	 */

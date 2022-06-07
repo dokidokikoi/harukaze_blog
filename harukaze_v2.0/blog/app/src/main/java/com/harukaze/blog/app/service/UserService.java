@@ -1,6 +1,7 @@
 package com.harukaze.blog.app.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.harukaze.blog.app.vo.UserVo;
 import com.harukaze.blog.common.utils.PageUtils;
 import com.harukaze.blog.app.entity.UserEntity;
 
@@ -16,5 +17,7 @@ import java.util.Map;
 public interface UserService extends IService<UserEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    UserVo toVo(UserEntity user);
 }
 

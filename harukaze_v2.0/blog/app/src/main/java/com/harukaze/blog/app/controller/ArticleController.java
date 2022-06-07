@@ -3,12 +3,9 @@ package com.harukaze.blog.app.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.harukaze.blog.app.vo.ArticleVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.harukaze.blog.app.entity.ArticleEntity;
 import com.harukaze.blog.app.service.ArticleService;
@@ -31,22 +28,34 @@ public class ArticleController {
     private ArticleService articleService;
 
     /**
-     * 列表
+     * 分页查询、条件查询
+     * {
+     * 	   "key": "summer",	// 文章标题关键字，标签名，分类名
+     *     "category": "1",	// 分类 id
+     *     "tags": [1, 3],		// 标签 id
+     *     "limit": 10,		// 分页大小
+     *     "page": 1,			// 当前页
+     *     "sort": {			// 排序
+     *         "time": "desc",
+     *         “view”: "asc",
+     *         "comment": "desc"
+     *     }
+     * }
      */
-    @RequestMapping("/list")
+    @GetMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = articleService.queryPage(params);
+        PageUtils page = articleService.listArticlePage(params);
 
-        return R.ok().put("page", page);
+        return R.ok().put("data", page);
     }
 
 
     /**
-     * 信息
+     * 查询文章详情
      */
     @RequestMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
-		ArticleEntity article = articleService.getById(id);
+        ArticleVo article = articleService.getArticleDetailById(id);
 
         return R.ok().put("article", article);
     }
