@@ -1,14 +1,15 @@
 package com.harukaze.blog.app.controller;
 
-import java.util.Arrays;
 import java.util.Map;
 
+import com.harukaze.blog.app.core.annotation.AccessLimit;
+import com.harukaze.blog.app.core.annotation.HasPermission;
+import com.harukaze.blog.app.core.annotation.LogAnnotation;
+import com.harukaze.blog.common.valid.AddGroup;
+import com.harukaze.blog.common.valid.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import com.harukaze.blog.app.entity.FriendLinkEntity;
 import com.harukaze.blog.app.service.FriendLinkService;
@@ -32,31 +33,39 @@ public class FriendLinkController {
 
     /**
      * 列表
+     * {
+     *     key: "",
+     *     page: 1,
+     *     limit: 5
+     * }
      */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = friendLinkService.queryPage(params);
+    @GetMapping("/list")
+    public R list(@RequestBody Map<String, Object> params){
+        PageUtils page = friendLinkService.listLinkPage(params);
 
-        return R.ok().put("page", page);
+        return R.ok().put("data", page);
     }
 
 
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}")
+    @GetMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
 		FriendLinkEntity friendLink = friendLinkService.getById(id);
 
-        return R.ok().put("friendLink", friendLink);
+        return R.ok().put("data", friendLink);
     }
 
     /**
-     * 保存
+     * 新增友链
      */
-    @RequestMapping("/save")
-    public R save(@RequestBody FriendLinkEntity friendLink){
-		friendLinkService.save(friendLink);
+    @LogAnnotation(module = "友链", operator = "新增友链")
+//    @HasPermission("link:add")
+    @AccessLimit
+    @PostMapping("/save")
+    public R save(@Validated(AddGroup.class) @RequestBody FriendLinkEntity friendLink){
+		friendLinkService.saveLink(friendLink);
 
         return R.ok();
     }
@@ -64,9 +73,12 @@ public class FriendLinkController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
-    public R update(@RequestBody FriendLinkEntity friendLink){
-		friendLinkService.updateById(friendLink);
+    @LogAnnotation(module = "友链", operator = "修改友链")
+//    @HasPermission("link:update")
+    @AccessLimit
+    @PutMapping("/update")
+    public R update(@Validated(UpdateGroup.class) @RequestBody FriendLinkEntity param){
+		friendLinkService.updateLink(param);
 
         return R.ok();
     }
@@ -74,11 +86,14 @@ public class FriendLinkController {
     /**
      * 删除
      */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		friendLinkService.removeByIds(Arrays.asList(ids));
-
-        return R.ok();
-    }
+//    @LogAnnotation(module = "友链", operator = "删除友链")
+//    @HasPermission("link:delete")
+//    @AccessLimit
+//    @DeleteMapping("/delete/{id}")
+//    public R delete(@PathVariable("id") Long id){
+//		friendLinkService.removeLink(id);
+//
+//        return R.ok();
+//    }
 
 }

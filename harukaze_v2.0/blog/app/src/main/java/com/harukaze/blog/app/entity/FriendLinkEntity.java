@@ -6,7 +6,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.harukaze.blog.common.valid.AddGroup;
+import com.harukaze.blog.common.valid.UpdateGroup;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * 
@@ -24,14 +30,19 @@ public class FriendLinkEntity implements Serializable {
 	 * 
 	 */
 	@TableId(type = IdType.AUTO)
+	@NotNull(message = "修改，id不能为空", groups = UpdateGroup.class)
 	private Long id;
 	/**
 	 * 网站名称
 	 */
+	@NotBlank(message = "修改，name不能为空", groups = UpdateGroup.class)
+	@NotBlank(message = "新增，name不能为空", groups = AddGroup.class)
 	private String name;
 	/**
 	 * 网址
 	 */
+	@NotBlank(message = "修改，url不能为空", groups = UpdateGroup.class)
+	@NotBlank(message = "新增，url不能为空", groups = AddGroup.class)
 	private String url;
 	/**
 	 * 头像
@@ -40,8 +51,12 @@ public class FriendLinkEntity implements Serializable {
 	/**
 	 * 描述
 	 */
+	@NotBlank(message = "修改，siteDesc不能为空", groups = UpdateGroup.class)
+	@NotBlank(message = "新增，siteDesc不能为空", groups = AddGroup.class)
 	private String siteDesc;
 
-	private Integer stats;
+	private Integer state;
+
+	private Long createDate;
 
 }

@@ -8,6 +8,7 @@ import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.harukaze.blog.app.entity.UserEntity;
 import com.harukaze.blog.app.param.LoginParam;
 import com.harukaze.blog.app.service.LoginService;
+import com.harukaze.blog.app.service.ThreadService;
 import com.harukaze.blog.app.service.UserService;
 import com.harukaze.blog.common.constant.LoginConstant;
 import com.harukaze.blog.common.utils.JwtUtils;
@@ -47,6 +48,9 @@ public class LoginServiceImpl implements LoginService {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    private ThreadService threadService;
 
     @Override
     public R getCaptcha() {
@@ -102,6 +106,9 @@ public class LoginServiceImpl implements LoginService {
         Map<String, Object> map = new HashMap<>();
         map.put("token", token);
         map.put("user_info", userService.toVo(user));
+
+        // 更新用户最近一次登录
+        threadService.updateUserLastLogin(user.getId());
 
         return R.ok("登录成功").put("data", map);
     }

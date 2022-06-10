@@ -20,5 +20,7 @@ public interface RolePermissionService extends IService<RolePermissionEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     List<PermissionEntity> listPermissionByRoleId(Long id);
+
+    List<PermissionEntity> getPermissionListByRoleId(Long id);
 }
 

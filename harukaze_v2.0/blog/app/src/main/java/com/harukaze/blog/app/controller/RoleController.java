@@ -3,12 +3,16 @@ package com.harukaze.blog.app.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.harukaze.blog.app.core.annotation.AccessLimit;
+import com.harukaze.blog.app.core.annotation.HasPermission;
+import com.harukaze.blog.app.core.annotation.LogAnnotation;
+import com.harukaze.blog.app.param.RoleParam;
+import com.harukaze.blog.app.vo.RoleVo;
+import com.harukaze.blog.common.valid.AddGroup;
+import com.harukaze.blog.common.valid.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import com.harukaze.blog.app.entity.RoleEntity;
 import com.harukaze.blog.app.service.RoleService;
@@ -32,31 +36,41 @@ public class RoleController {
 
     /**
      * 列表
+     * {
+     *     key: "",
+     *     page: 1,
+     *     limit: 5
+     * }
      */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = roleService.queryPage(params);
+    @AccessLimit
+    @GetMapping("/list")
+    public R list(@RequestBody Map<String, Object> params){
+        PageUtils page = roleService.listRolePage(params);
 
-        return R.ok().put("page", page);
+        return R.ok().put("data", page);
     }
 
 
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}")
+    @AccessLimit
+    @GetMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
-		RoleEntity role = roleService.getById(id);
+		RoleVo role = roleService.getRoleById(id);
 
-        return R.ok().put("role", role);
+        return R.ok().put("data", role);
     }
 
     /**
-     * 保存
+     * 新增角色
      */
-    @RequestMapping("/save")
-    public R save(@RequestBody RoleEntity role){
-		roleService.save(role);
+    @LogAnnotation(module = "角色", operator = "新增角色")
+    @HasPermission("role:save")
+    @AccessLimit
+    @PostMapping("/save")
+    public R save(@Validated(AddGroup.class) @RequestBody RoleEntity role){
+		roleService.saveRole(role);
 
         return R.ok();
     }
@@ -64,9 +78,12 @@ public class RoleController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
-    public R update(@RequestBody RoleEntity role){
-		roleService.updateById(role);
+    @LogAnnotation(module = "角色", operator = "修改角色")
+    @HasPermission("role:update")
+    @AccessLimit
+    @PutMapping("/update")
+    public R update(@Validated(UpdateGroup.class) @RequestBody RoleParam param){
+		roleService.updateRole(param);
 
         return R.ok();
     }
@@ -74,11 +91,11 @@ public class RoleController {
     /**
      * 删除
      */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		roleService.removeByIds(Arrays.asList(ids));
-
-        return R.ok();
-    }
+//    @RequestMapping("/delete")
+//    public R delete(@RequestBody Long[] ids){
+//		roleService.removeByIds(Arrays.asList(ids));
+//
+//        return R.ok();
+//    }
 
 }

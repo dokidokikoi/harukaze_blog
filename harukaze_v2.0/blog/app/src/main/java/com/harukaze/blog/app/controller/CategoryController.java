@@ -3,12 +3,16 @@ package com.harukaze.blog.app.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.harukaze.blog.app.core.annotation.AccessLimit;
+import com.harukaze.blog.app.core.annotation.HasPermission;
+import com.harukaze.blog.app.core.annotation.LogAnnotation;
+import com.harukaze.blog.common.constant.ResponseStatus;
+import com.harukaze.blog.common.valid.AddGroup;
+import com.harukaze.blog.common.valid.UpdateGroup;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import com.harukaze.blog.app.entity.CategoryEntity;
 import com.harukaze.blog.app.service.CategoryService;
@@ -31,31 +35,39 @@ public class CategoryController {
     private CategoryService categoryService;
 
     /**
-     * 列表
+     * 查询文章分类列表
+     * {
+     * 	"key": "te",
+     * 	"page": 1,
+     * 	"limit": 10
+     * }
      */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = categoryService.queryPage(params);
+    @GetMapping("/list")
+    public R list(@RequestBody Map<String, Object> params){
+        PageUtils page = categoryService.listCategoryPage(params);
 
-        return R.ok().put("page", page);
+        return R.ok().put("data", page);
     }
 
 
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}")
+    @GetMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
 		CategoryEntity category = categoryService.getById(id);
 
-        return R.ok().put("category", category);
+        return R.ok().put("data", category);
     }
 
     /**
-     * 保存
+     * 新增分类
      */
-    @RequestMapping("/save")
-    public R save(@RequestBody CategoryEntity category){
+    @LogAnnotation(module = "文章分类", operator = "新增分类")
+    @HasPermission("article:add")
+    @AccessLimit
+    @PostMapping("/save")
+    public R save(@Validated(AddGroup.class) @RequestBody CategoryEntity category){
 		categoryService.save(category);
 
         return R.ok();
@@ -64,8 +76,11 @@ public class CategoryController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
-    public R update(@RequestBody CategoryEntity category){
+    @LogAnnotation(module = "文章分类", operator = "修改分类")
+    @HasPermission("article:update")
+    @AccessLimit
+    @PutMapping("/update")
+    public R update(@Validated(UpdateGroup.class) @RequestBody CategoryEntity category){
 		categoryService.updateById(category);
 
         return R.ok();
@@ -73,12 +88,26 @@ public class CategoryController {
 
     /**
      * 删除
+     * 分类下没有文章可删除
      */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		categoryService.removeByIds(Arrays.asList(ids));
+    @LogAnnotation(module = "文章分类", operator = "删除分类")
+    @HasPermission("article:update")
+    @AccessLimit
+    @DeleteMapping("/delete/{id}")
+    public R delete(@PathVariable("id") Long id){
+        boolean b = categoryService.removeCategoryById(id);
 
-        return R.ok();
+        return b ? R.ok() : R.error(ResponseStatus.CATEGORY_DELETE_ERR.getCode(), ResponseStatus.CATEGORY_DELETE_ERR.getMsg());
+    }
+
+    /**
+     * 查询分类下的文章、评论、观看数
+     */
+    @GetMapping("/{id}/articles")
+    public R getCategoryData(@PathVariable("id") Long id){
+        Map<String, Integer> data = categoryService.getCategoryData(id);
+
+        return R.ok().put("data", data);
     }
 
 }

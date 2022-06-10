@@ -3,12 +3,17 @@ package com.harukaze.blog.app.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.harukaze.blog.app.core.annotation.AccessLimit;
+import com.harukaze.blog.app.core.annotation.HasPermission;
+import com.harukaze.blog.app.core.annotation.LogAnnotation;
+import com.harukaze.blog.app.service.ArticleTagService;
+import com.harukaze.blog.common.constant.ResponseStatus;
+import com.harukaze.blog.common.valid.AddGroup;
+import com.harukaze.blog.common.valid.UpdateGroup;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import com.harukaze.blog.app.entity.TagEntity;
 import com.harukaze.blog.app.service.TagService;
@@ -30,32 +35,44 @@ public class TagController {
     @Autowired
     private TagService tagService;
 
-    /**
-     * 列表
-     */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = tagService.queryPage(params);
+    @Autowired
+    private ArticleTagService articleTagService;
 
-        return R.ok().put("page", page);
+    /**
+     * 查询标签列表
+     * {
+     * 	"key": "te",
+     * 	"page": 1,
+     * 	"limit": 10
+     * }
+     */
+    @GetMapping("/list")
+    public R list(@RequestParam Map<String, Object> params){
+        PageUtils page = tagService.listTagPage(params);
+
+        return R.ok().put("data", page);
     }
 
 
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}")
+    @GetMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
 		TagEntity tag = tagService.getById(id);
 
-        return R.ok().put("tag", tag);
+        return R.ok().put("data", tag);
     }
 
     /**
-     * 保存
+     * 新增标签
+     *
      */
-    @RequestMapping("/save")
-    public R save(@RequestBody TagEntity tag){
+    @LogAnnotation(module = "标签", operator = "新增标签")
+    @HasPermission("article:add")
+    @AccessLimit
+    @PostMapping("/save")
+    public R save(@Validated(AddGroup.class) @RequestBody TagEntity tag){
 		tagService.save(tag);
 
         return R.ok();
@@ -64,8 +81,11 @@ public class TagController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
-    public R update(@RequestBody TagEntity tag){
+    @LogAnnotation(module = "标签", operator = "修改标签")
+    @HasPermission("article:update")
+    @AccessLimit
+    @PutMapping("/update")
+    public R update(@Validated(UpdateGroup.class) @RequestBody TagEntity tag){
 		tagService.updateById(tag);
 
         return R.ok();
@@ -73,12 +93,26 @@ public class TagController {
 
     /**
      * 删除
+     * 标签下没有文章，可删除
      */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		tagService.removeByIds(Arrays.asList(ids));
+    @LogAnnotation(module = "标签", operator = "删除标签")
+    @HasPermission("article:update")
+    @AccessLimit
+    @DeleteMapping("/delete/{id}")
+    public R delete(@PathVariable("id") Long id){
+		boolean flag = tagService.removeTagById(id);
 
-        return R.ok();
+        return flag ? R.ok() : R.error(ResponseStatus.TAG_DELETE_ERR.getCode(), ResponseStatus.TAG_DELETE_ERR.getMsg());
+    }
+
+    /**
+     * 查询标签下的文章、评论、观看数
+     */
+    @GetMapping("/{id}/articles")
+    public R getTagData(@PathVariable("id") Long id){
+        Map<String, Integer> data = articleTagService.getData(id);
+
+        return R.ok().put("data", data);
     }
 
 }

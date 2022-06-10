@@ -2,17 +2,22 @@ package com.harukaze.blog.app.vo;
 
 import com.harukaze.blog.app.entity.ArticleBodyEntity;
 import com.harukaze.blog.app.entity.CategoryEntity;
+import com.harukaze.blog.app.entity.TagEntity;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @PackageName: com.harukaze.blog.app.vo
  * @ClassName: ArticleVo
  * @Description:
  * @Author: doki
- * @Date: 2022/6/7 14:25
+ * @Date: 2022/6/7 15:51
  */
+
 @Data
 public class ArticleVo {
+
     private Long id;
     /**
      * 标题
@@ -51,15 +56,17 @@ public class ArticleVo {
      */
     private Long updateDate;
     /**
-     * 作者
-     */
-    private UserVo user;
-    /**
      * 文章
      */
     private ArticleBodyEntity body;
     /**
+     * 作者
+     */
+    private UserVo author;
+    /**
      * 分类
      */
     private CategoryEntity category;
+
+    private List<TagEntity> tags;
 }

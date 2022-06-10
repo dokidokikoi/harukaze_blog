@@ -3,12 +3,14 @@ package com.harukaze.blog.app.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.harukaze.blog.app.core.annotation.AccessLimit;
+import com.harukaze.blog.app.core.annotation.HasPermission;
+import com.harukaze.blog.app.core.annotation.LogAnnotation;
+import com.harukaze.blog.app.param.CommentParam;
+import com.harukaze.blog.common.valid.AddGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import com.harukaze.blog.app.entity.CommentEntity;
 import com.harukaze.blog.app.service.CommentService;
@@ -32,31 +34,35 @@ public class CommentController {
 
     /**
      * 列表
+     * 根据文章id获取文章评论列表
+     * 如果文章id为0，则是留言
      */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = commentService.queryPage(params);
+    @GetMapping("/list/{articleId}")
+    public R list(@PathVariable("articleId") Long articleId, @RequestBody Map<String, Object> params){
+        PageUtils page = commentService.listCommentPage(articleId, params);
 
-        return R.ok().put("page", page);
+        return R.ok().put("data", page);
     }
 
 
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}")
-    public R info(@PathVariable("id") Long id){
-		CommentEntity comment = commentService.getById(id);
-
-        return R.ok().put("comment", comment);
-    }
+//    @GetMapping("/info/{id}")
+//    public R info(@PathVariable("id") Long id){
+//		CommentEntity comment = commentService.getById(id);
+//
+//        return R.ok().put("data", comment);
+//    }
 
     /**
-     * 保存
+     * 发表评论
      */
-    @RequestMapping("/save")
-    public R save(@RequestBody CommentEntity comment){
-		commentService.save(comment);
+    @LogAnnotation(module = "评论", operator = "发表评论")
+    @AccessLimit(isMustLogin = false)
+    @PostMapping("/save")
+    public R save(@Validated(AddGroup.class) @RequestBody CommentParam param){
+		commentService.saveComment(param);
 
         return R.ok();
     }
@@ -64,9 +70,12 @@ public class CommentController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
-    public R update(@RequestBody CommentEntity comment){
-		commentService.updateById(comment);
+    @LogAnnotation(module = "评论", operator = "修改评论")
+    @HasPermission("comment:update")
+    @AccessLimit
+    @PutMapping("/update")
+    public R update(@Validated @RequestBody CommentEntity comment) throws Exception {
+		commentService.updateComment(comment);
 
         return R.ok();
     }
@@ -74,11 +83,12 @@ public class CommentController {
     /**
      * 删除
      */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		commentService.removeByIds(Arrays.asList(ids));
-
-        return R.ok();
-    }
+//    @AccessLimit
+//    @DeleteMapping("/delete")
+//    public R delete(@RequestBody Long[] ids){
+//		commentService.removeByIds(Arrays.asList(ids));
+//
+//        return R.ok();
+//    }
 
 }

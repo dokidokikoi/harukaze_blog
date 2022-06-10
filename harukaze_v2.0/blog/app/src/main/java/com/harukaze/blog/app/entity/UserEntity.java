@@ -6,7 +6,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.harukaze.blog.common.valid.AddGroup;
+import com.harukaze.blog.common.valid.UpdateGroup;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * 
@@ -24,10 +30,12 @@ public class UserEntity implements Serializable {
 	 * 
 	 */
 	@TableId(type = IdType.AUTO)
+	@NotNull(message = "更新，id不能为空", groups = UpdateGroup.class)
 	private Long id;
 	/**
 	 * 账号
 	 */
+	@NotBlank(message = "修改，account不能为空", groups = AddGroup.class)
 	private String account;
 	/**
 	 * 头像
@@ -48,10 +56,12 @@ public class UserEntity implements Serializable {
 	/**
 	 * 昵称
 	 */
+	@NotBlank(message = "新增，nickname不能为空", groups = AddGroup.class)
 	private String nickname;
 	/**
 	 * 密码
 	 */
+	@NotBlank(message = "新增，password不能为空", groups = AddGroup.class)
 	private String password;
 	/**
 	 * 状态

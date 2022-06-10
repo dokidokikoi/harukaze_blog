@@ -1,8 +1,12 @@
 package com.harukaze.blog.app.dao;
 
+import com.harukaze.blog.app.entity.PermissionEntity;
 import com.harukaze.blog.app.entity.RolePermissionEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 
@@ -13,5 +17,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface RolePermissionDao extends BaseMapper<RolePermissionEntity> {
-	
+
+    List<PermissionEntity> selectPermissionListByRoleId(@Param("id") Long id);
 }

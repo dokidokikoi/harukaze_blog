@@ -1,9 +1,11 @@
 package com.harukaze.blog.app.config;
 
+import com.harukaze.blog.app.interceptor.JwtInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
+import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -25,27 +27,32 @@ import java.util.concurrent.Executors;
 
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
-//    @Autowired
-//    private JwtInterceptor jwtInterceptor;
-//
-//    @Override
-//    public void configureAsyncSupport(AsyncSupportConfigurer configurer){
-//        configurer.setTaskExecutor(new ConcurrentTaskExecutor(Executors.newFixedThreadPool(3)));
-//        configurer.setDefaultTimeout(30000);
-//    }
-//
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry){
-//        List<String> excludePath = new ArrayList<>();
-//        //排除拦截，除了登录(此时还没token)，其他都拦截
-//        excludePath.add("/app/login/**");
-//
-//        registry.addInterceptor(jwtInterceptor)
-//                .addPathPatterns("/app/**")
-//                .excludePathPatterns(excludePath);
-//        WebMvcConfigurer.super.addInterceptors(registry);
-//    }
+    @Autowired
+    private JwtInterceptor jwtInterceptor;
 
+    @Override
+    public void configureAsyncSupport(AsyncSupportConfigurer configurer){
+        configurer.setTaskExecutor(new ConcurrentTaskExecutor(Executors.newFixedThreadPool(3)));
+        configurer.setDefaultTimeout(30000);
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry){
+        List<String> excludePath = new ArrayList<>();
+        //排除拦截，除了登录(此时还没token)，其他都拦截
+        excludePath.add("/app/login");
+        excludePath.add("/app/captcha");
+
+        registry.addInterceptor(jwtInterceptor)
+                .addPathPatterns("/app/**")
+                .excludePathPatterns(excludePath);
+        WebMvcConfigurer.super.addInterceptors(registry);
+    }
+
+    /**
+     * 跨越配置
+     * Interceptor 可能跨域：
+     */
 //    @Override
 //    public void addCorsMappings(CorsRegistry registry) {
 //        // 配置跨域请求
@@ -76,5 +83,10 @@ public class MvcConfig implements WebMvcConfigurer {
         UrlBasedCorsConfigurationSource configSource = new UrlBasedCorsConfigurationSource();
         configSource.registerCorsConfiguration("/**", config);
         return new CorsFilter(configSource);
+    }
+
+    @Bean
+    public RequestContextListener requestContextListener(){
+        return new RequestContextListener();
     }
 }

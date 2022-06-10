@@ -1,6 +1,7 @@
 package com.harukaze.blog.app.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.harukaze.blog.app.param.CommentParam;
 import com.harukaze.blog.common.utils.PageUtils;
 import com.harukaze.blog.app.entity.CommentEntity;
 
@@ -16,5 +17,11 @@ import java.util.Map;
 public interface CommentService extends IService<CommentEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    PageUtils listCommentPage(Long articleId,  Map<String, Object> params);
+
+    void saveComment(CommentParam param);
+
+    void updateComment(CommentEntity comment) throws Exception;
 }
 

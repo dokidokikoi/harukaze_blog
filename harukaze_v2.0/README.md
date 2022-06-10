@@ -6,6 +6,10 @@
 
 请求地址：api/app/captcha
 
+请求类型：GET
+
+请求头：
+
 请求参数：
 
 ```json
@@ -29,6 +33,10 @@
 ### 1.2.登录
 
 请求地址：api/app/login
+
+请求类型：GET
+
+请求头：Content-Type: application/x-www-form-urlencoded
 
 请求参数：
 
@@ -70,6 +78,10 @@
 
 请求地址：api/app/logout
 
+请求类型：POST
+
+请求头：Authorization: {token}
+
 请求参数：
 
 ```json
@@ -87,15 +99,15 @@
 }
 ```
 
-### 
-
-
-
 ## 2.文章
 
 ### 2.1.请求文章列表
 
 请求地址：api/app/article/list
+
+请求类型：POST
+
+请求头：Authorization: {token}
 
 请求参数：
 
@@ -121,7 +133,7 @@
     "msg": "success",
     "code": 200,
     "data": {
-        "totalCount": 2,
+        "totalCount": 3,
         "pageSize": 10,
         "totalPage": 1,
         "currPage": 1,
@@ -137,9 +149,36 @@
                 "state": 0,
                 "createDate": 1654073427219,
                 "updateDate": null,
-                "authorId": 1,
-                "bodyId": null,
-                "categoryId": 1
+                "body": null,
+                "author": {
+                    "id": 1,
+                    "account": "admin",
+                    "avatar": null,
+                    "createDate": 1654073427219,
+                    "email": null,
+                    "lastLogin": null,
+                    "nickname": "admin",
+                    "state": 0,
+                    "summary": null,
+                    "roles": [],
+                    "permissions": []
+                },
+                "category": {
+                    "id": 1,
+                    "avatar": null,
+                    "categoryName": "tech",
+                    "categoryDesc": "技术文章/学习笔记"
+                },
+                "tags": [
+                    {
+                        "id": 2,
+                        "tagName": "java"
+                    },
+                    {
+                        "id": 1,
+                        "tagName": "mysql"
+                    }
+                ]
             },
             {
                 "id": 2,
@@ -152,9 +191,78 @@
                 "state": 0,
                 "createDate": 1654073427218,
                 "updateDate": null,
-                "authorId": 1,
-                "bodyId": null,
-                "categoryId": 1
+                "body": null,
+                "author": {
+                    "id": 1,
+                    "account": "admin",
+                    "avatar": null,
+                    "createDate": 1654073427219,
+                    "email": null,
+                    "lastLogin": null,
+                    "nickname": "admin",
+                    "state": 0,
+                    "summary": null,
+                    "roles": [],
+                    "permissions": []
+                },
+                "category": {
+                    "id": 1,
+                    "avatar": null,
+                    "categoryName": "tech",
+                    "categoryDesc": "技术文章/学习笔记"
+                },
+                "tags": [
+                    {
+                        "id": 1,
+                        "tagName": "mysql"
+                    },
+                    {
+                        "id": 4,
+                        "tagName": "数据库"
+                    }
+                ]
+            },
+            {
+                "id": 6,
+                "title": "test123",
+                "summary": "hahahhah",
+                "cover": "",
+                "viewCounts": 0,
+                "commentCounts": 0,
+                "weight": 1,
+                "state": 0,
+                "createDate": 1654655194452,
+                "updateDate": 1654655697786,
+                "body": null,
+                "author": {
+                    "id": 1,
+                    "account": "admin",
+                    "avatar": null,
+                    "createDate": 1654073427219,
+                    "email": null,
+                    "lastLogin": null,
+                    "nickname": "admin",
+                    "state": 0,
+                    "summary": null,
+                    "roles": [],
+                    "permissions": []
+                },
+                "category": {
+                    "id": 1,
+                    "avatar": null,
+                    "categoryName": "tech",
+                    "categoryDesc": "技术文章/学习笔记"
+                },
+                "tags": [
+                    {
+                        "id": 2,
+                        "tagName": "java"
+                    },
+                    {
+                        "id": 11,
+                        "tagName": "test123"
+                    }
+                ]
             }
         ]
     }
@@ -164,6 +272,8 @@
 ### 2.2.请求文章详情
 
 请求地址：api/app/article/info/{id}
+
+请求类型：GET
 
 请求参数：
 
@@ -214,4 +324,1384 @@
 }
 ```
 
-### 
+### 2.3.写文章
+
+请求地址：api/app/article/sava
+
+请求类型：POST
+
+请求头：Authorization: {token}
+
+请求参数：
+
+```json
+{
+	"title": "test3",
+	"summary": "testtest",
+	"cover": "",
+	"weight": 1,
+	"state": 0,
+	"body": {
+		"id": "",
+		"content": "test from postman",
+		"contentHtml": "<h1>test from postman</h1>"
+	},
+	"category": {
+		"id": "1",
+		"avatar": "",
+		"categoryName": "",
+		"categoryDesc": ""
+	},
+	"tags": [
+		{
+			"id": "1"
+		},
+		{
+			"id": "",
+			"tagName": "test"
+		}
+	]
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 2.4.修改文章
+
+请求地址：api/app/article/update
+
+请求类型：PUT
+
+请求头：Authorization: {token}
+
+请求参数：
+
+```json
+{
+	"id": "6",
+	"title": "test123",
+	"summary": "hahahhah",
+	"cover": "",
+	"weight": 1,
+	"state": 0,
+	"body": {
+		"id": "5",
+		"content": "test from postman, update",
+		"contentHtml": "<h1>test from postman, update</h1>"
+	},
+	"category": {
+		"id": "1"
+	},
+	"tags": [
+		{
+			"id": "2"
+		},
+		{
+			"id": "",
+			"tagName": "test123"
+		}
+	]
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 2.5.设置文章状态
+
+请求地址：api/app/article/set_state
+
+请求类型：PUT
+
+请求头：Authorization: {token}
+
+请求参数：
+
+| id   | flag  |
+| ---- | ----- |
+| "6"  | false |
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+
+
+### 2.6.文章归档
+
+前端获取数据实现
+
+
+
+
+
+## 3.文章分类
+
+### 3.1.分页查询分类
+
+请求地址：api/app/category/list
+
+请求类型：GET
+
+请求参数：
+
+```json
+{
+	"key": "te",
+	"page": 1,
+	"limit": 10
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "page": {
+        "totalCount": 2,
+        "pageSize": 10,
+        "totalPage": 1,
+        "currPage": 1,
+        "list": [
+            {
+                "id": 1,
+                "avatar": null,
+                "categoryName": "tech",
+                "categoryDesc": "技术文章/学习笔记"
+            },
+            {
+                "id": 3,
+                "avatar": null,
+                "categoryName": "note",
+                "categoryDesc": "随笔"
+            }
+        ]
+    }
+}
+```
+
+### 3.2.新增分类
+
+请求地址：api/app/category/save
+
+请求类型：POST
+
+请求参数：
+
+```json
+{
+	"id": "",
+	"avatar": "",
+	"categoryName": "test",
+	"categoryDesc": "test from postman"
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 3.3.修改分类
+
+请求地址：api/app/category/update
+
+请求类型：PUT
+
+请求参数：
+
+```json
+{
+	"id": "5",
+	"avatar": "",
+	"categoryName": "test123",
+	"categoryDesc": "test from postman, update"
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 3.4.删除分类
+
+> 分类下没有文章，可删除
+
+请求地址：api/app/category/delete/{id}
+
+请求类型：DELETE
+
+请求参数：5
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 3.5.查询分类下的文章、评论、观看数
+
+请求地址：api/app/category/{id}/articles
+
+请求类型：GET
+
+请求参数：1
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "articleCount": 3,
+        "viewCount": 0,
+        "commentCount": 0
+    }
+}
+```
+
+
+
+## 4.文章标签
+
+### 4.1.查询标签列表
+
+请求地址：api/app/tag/list
+
+请求类型：GET
+
+请求参数：
+
+```json
+{
+	"key": "te",
+	"page": 1,
+	"limit": 10
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "totalCount": 7,
+        "pageSize": 10,
+        "totalPage": 1,
+        "currPage": 1,
+        "list": [
+            {
+                "id": 1,
+                "tagName": "mysql"
+            },
+            {
+                "id": 2,
+                "tagName": "java"
+            },
+            {
+                "id": 3,
+                "tagName": "docker"
+            },
+            {
+                "id": 4,
+                "tagName": "数据库"
+            },
+            {
+                "id": 5,
+                "tagName": "nginx"
+            },
+            {
+                "id": 9,
+                "tagName": "test"
+            },
+            {
+                "id": 11,
+                "tagName": "test123"
+            }
+        ]
+    }
+}
+```
+
+### 4.2.新增标签
+
+请求地址：api/app/tag/save
+
+请求类型：POST
+
+请求参数：
+
+```json
+{
+	"id": "",
+	"tagName": "test234"
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 4.3.修改标签
+
+请求地址：api/app/tag/update
+
+请求类型：PUT
+
+请求参数：
+
+```json
+{
+	"id": "11",
+	"tagName": "test345"
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 4.4.删除标签
+
+> 标签下没有文章，可删除
+
+请求地址：api/app/tag/delete/{id}
+
+请求类型：DELETE
+
+请求参数：12
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 4.5.查询标签下的文章、评论、观看数
+
+请求地址：api/app/category/{id}/articles
+
+请求类型：GET
+
+请求参数：1
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "articleCount": 3,
+        "viewCount": 0,
+        "commentCount": 0
+    }
+}
+```
+
+
+
+## 5.评论
+
+### 5.1.查询评论列表
+
+请求地址：api/app/comment/list/{articleId}
+
+请求类型：GET
+
+请求参数：1
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "totalCount": 1,
+        "pageSize": 5,
+        "totalPage": 1,
+        "currPage": 1,
+        "list": [
+            {
+                "id": 7,
+                "content": null,
+                "level": 1,
+                "createDate": null,
+                "state": 0,
+                "author": {
+                    "id": 1,
+                    "account": "admin",
+                    "avatar": null,
+                    "createDate": 1654073427219,
+                    "email": null,
+                    "lastLogin": null,
+                    "nickname": "admin",
+                    "state": 0,
+                    "summary": null,
+                    "roles": [],
+                    "permissions": []
+                },
+                "toUserNickname": null,
+                "weight": 1,
+                "children": [
+                    {
+                        "id": 9,
+                        "content": null,
+                        "level": 2,
+                        "createDate": null,
+                        "state": 0,
+                        "author": {
+                            "id": 2,
+                            "account": "test",
+                            "avatar": null,
+                            "createDate": null,
+                            "email": null,
+                            "lastLogin": null,
+                            "nickname": "test",
+                            "state": 0,
+                            "summary": null,
+                            "roles": [],
+                            "permissions": []
+                        },
+                        "toUserNickname": "admin",
+                        "weight": 1,
+                        "children": null
+                    },
+                    {
+                        "id": 10,
+                        "content": null,
+                        "level": 2,
+                        "createDate": null,
+                        "state": 0,
+                        "author": {
+                            "id": 2,
+                            "account": "test",
+                            "avatar": null,
+                            "createDate": null,
+                            "email": null,
+                            "lastLogin": null,
+                            "nickname": "test",
+                            "state": 0,
+                            "summary": null,
+                            "roles": [],
+                            "permissions": []
+                        },
+                        "toUserNickname": "admin",
+                        "weight": 1,
+                        "children": null
+                    }
+                ]
+            }
+        ]
+    }
+}
+```
+
+### 5.2.新增评论
+
+请求地址：api/app/comment/save
+
+请求类型：POST
+
+请求参数：
+
+```json
+{
+	"id": "1",
+	"content": "test from post man",
+	"articleId": "1",
+	"author": {
+		"id": "",
+		"name": "test"
+	},
+	"parentId": "7",
+	"toUser": {
+		"id": "",
+		"name": "lisi"
+	}
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 5.2.修改评论
+
+> 未登录不能修改评论，可联系管理员删除
+
+请求地址：api/app/comment/update
+
+请求类型：PUT
+
+请求参数：
+
+````json
+{
+	"id": "14",
+	"content": "test content from post man",
+	"state": 1,		// 逻辑删除字段，可不传。0 正常，1 逻辑删除
+	"weight": 10	// 置顶字段，可不传。1 正常，10 置顶
+}
+````
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+
+
+## 6.用户
+
+### 6.1.查询用户列表
+
+请求地址：api/app/user/list
+
+请求类型：GET
+
+请求参数：
+
+```json
+{
+	"key": "",
+	"page": 1,
+	"limit": 5
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "totalCount": 2,
+        "pageSize": 10,
+        "totalPage": 1,
+        "currPage": 1,
+        "list": [
+            {
+                "id": 1,
+                "account": "admin",
+                "avatar": null,
+                "createDate": 1654073427219,
+                "email": null,
+                "lastLogin": null,
+                "nickname": "admin",
+                "state": 0,
+                "summary": null,
+                "roles": [],
+                "permissions": []
+            },
+            {
+                "id": 2,
+                "account": "test",
+                "avatar": null,
+                "createDate": null,
+                "email": null,
+                "lastLogin": null,
+                "nickname": "test",
+                "state": 0,
+                "summary": null,
+                "roles": [],
+                "permissions": []
+            }
+        ]
+    }
+}
+```
+
+### 6.2.获取当前用户信息
+
+请求地址：api/app/user/info
+
+请求类型：GET
+
+请求参数：
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "id": 1,
+        "account": "admin",
+        "avatar": null,
+        "createDate": 1654073427219,
+        "email": null,
+        "lastLogin": null,
+        "nickname": "admin",
+        "state": 0,
+        "summary": null,
+        "roles": [],
+        "permissions": []
+    }
+}
+```
+
+### 6.3.新增用户信息
+
+请求地址：api/app/user/save
+
+请求类型：POST
+
+请求参数：
+
+```json
+{
+	"account": "test123",
+	"avatar": "",
+	"email": "",
+	"nickname": "test123",
+	"password": "123456",
+	"state": 0,
+	"summary": "sdsax"
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 6.4.修改用户信息
+
+请求地址：api/app/user/update
+
+请求类型：PUT
+
+请求参数：
+
+```json
+{
+	"id": "3",
+	"avatar": "",
+	"email": "",
+	"nickname": "test234",
+	"state": 0,
+	"summary": "test from postman"
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+
+
+## 7.角色
+
+### 7.1.查询角色列表
+
+请求地址：api/app/role/list
+
+请求类型：GET
+
+请求参数：
+
+```json
+{
+	"key": "ad",
+	"page": 1,
+	"limit": 5
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "totalCount": 1,
+        "pageSize": 5,
+        "totalPage": 1,
+        "currPage": 1,
+        "list": [
+            {
+                "id": 1,
+                "roleName": "admin",
+                "roleDesc": "admin",
+                "permissions": [
+                    {
+                        "id": 1,
+                        "path": "api/",
+                        "name": "user:add"
+                    },
+                    {
+                        "id": 2,
+                        "path": null,
+                        "name": "user:update"
+                    },
+                    {
+                        "id": 3,
+                        "path": null,
+                        "name": "user:select"
+                    },
+                    {
+                        "id": 6,
+                        "path": null,
+                        "name": "role:add"
+                    },
+                    {
+                        "id": 7,
+                        "path": null,
+                        "name": "role:update"
+                    }
+                ]
+            }
+        ]
+    }
+}
+```
+
+### 7.2.查询角色信息
+
+请求地址：api/app/role/info/{id}
+
+请求类型：GET
+
+请求参数：1
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "id": 1,
+        "roleName": "admin",
+        "roleDesc": "admin",
+        "permissions": [
+            {
+                "id": 1,
+                "path": "api/",
+                "name": "user:add"
+            },
+            {
+                "id": 2,
+                "path": null,
+                "name": "user:update"
+            },
+            {
+                "id": 3,
+                "path": null,
+                "name": "user:select"
+            },
+            {
+                "id": 6,
+                "path": null,
+                "name": "role:add"
+            },
+            {
+                "id": 7,
+                "path": null,
+                "name": "role:update"
+            }
+        ]
+    }
+}
+```
+
+### 7.2.新增角色
+
+请求地址：api/app/role/save
+
+请求类型：POST
+
+请求参数：
+
+```json
+{
+	"roleName": "test123",
+	"roleDesc": "test123"
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 7.3.修改角色
+
+请求地址：api/app/role/update
+
+请求类型：PUT
+
+请求参数：
+
+```json
+{
+	"id": "3",
+	"roleName": "test234",
+	"roleDesc": "rest234",
+	"permissions": [1, 2, 3, 10]
+}
+```
+
+返回参数：
+
+```json
+{
+	"roleName": "test123",
+	"roleDesc": "test123"
+}
+```
+
+
+
+## 8.权限
+
+### 8.1.查询权限列表
+
+请求地址：api/app/permission/list
+
+请求类型：GET
+
+请求参数：
+
+```json
+{
+	"key": "",
+	"page": 1,
+	"limit": 10
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "totalCount": 8,
+        "pageSize": 10,
+        "totalPage": 1,
+        "currPage": 1,
+        "list": [
+            {
+                "id": 1,
+                "path": "api/",
+                "name": "user:add"
+            },
+            {
+                "id": 2,
+                "path": null,
+                "name": "user:update"
+            },
+            {
+                "id": 3,
+                "path": null,
+                "name": "user:select"
+            },
+            {
+                "id": 4,
+                "path": null,
+                "name": "article:add"
+            },
+            {
+                "id": 5,
+                "path": null,
+                "name": "article:update"
+            },
+            {
+                "id": 6,
+                "path": null,
+                "name": "role:add"
+            },
+            {
+                "id": 7,
+                "path": null,
+                "name": "role:update"
+            },
+            {
+                "id": 8,
+                "path": null,
+                "name": null
+            }
+        ]
+    }
+}
+```
+
+### 8.2.查询权限信息
+
+请求地址：api/app/permission/info/{id}
+
+请求类型：GET
+
+请求参数：1
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "id": 1,
+        "path": "api/",
+        "name": "user:add"
+    }
+}
+```
+
+### 8.3.新增权限
+
+请求地址：api/app/permission/save
+
+请求类型：POST
+
+请求参数：
+
+```json
+{
+	"path": "",
+	"name": "test"
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 8.3.修改权限
+
+请求地址：api/app/permission/update
+
+请求类型：PUT
+
+请求参数：
+
+```json
+{
+	"id": "9",
+	"path": "",
+	"name": "test123"
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+
+
+## 9.日志
+
+### 9.1.查询日志列表
+
+请求地址：api/app/log/list
+
+请求类型：GET
+
+请求参数：
+
+```json
+{
+	"key": "",
+	"page": 1,
+	"limit": 5
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "totalCount": 9,
+        "pageSize": 5,
+        "totalPage": 2,
+        "currPage": 1,
+        "list": [
+            {
+                "id": 1,
+                "ip": 2130706433,
+                "module": "文章",
+                "method": "info",
+                "address": "内网IP|内网IP",
+                "operation": "查询文章详情",
+                "params": null,
+                "time": 334,
+                "userId": null,
+                "browser": "PostmanRuntime 7.6.0",
+                "createDate": 1654791413234,
+                "os": "Unknown ??"
+            },
+            {
+                "id": 2,
+                "ip": 2130706433,
+                "module": "文章",
+                "method": "info",
+                "address": "内网IP|内网IP",
+                "operation": "查询文章详情",
+                "params": null,
+                "time": 322,
+                "userId": null,
+                "browser": "PostmanRuntime 7.6.0",
+                "createDate": 1654791793906,
+                "os": "Unknown ??"
+            },
+            {
+                "id": 3,
+                "ip": 2130706433,
+                "module": "文章",
+                "method": "info",
+                "address": "内网IP|内网IP",
+                "operation": "查询文章详情",
+                "params": null,
+                "time": 306,
+                "userId": null,
+                "browser": "PostmanRuntime 7.6.0",
+                "createDate": 1654791872137,
+                "os": "Unknown ??"
+            },
+            {
+                "id": 4,
+                "ip": 2130706433,
+                "module": "文章",
+                "method": "info",
+                "address": "内网IP|内网IP",
+                "operation": "查询文章详情",
+                "params": null,
+                "time": 302,
+                "userId": null,
+                "browser": "PostmanRuntime 7.6.0",
+                "createDate": 1654792183818,
+                "os": "Unknown ??"
+            },
+            {
+                "id": 5,
+                "ip": 2130706433,
+                "module": "文章",
+                "method": "info",
+                "address": "内网IP|内网IP",
+                "operation": "查询文章详情",
+                "params": null,
+                "time": 277,
+                "userId": null,
+                "browser": "PostmanRuntime 7.6.0",
+                "createDate": 1654793001133,
+                "os": "Unknown ??"
+            }
+        ]
+    }
+}
+```
+
+### 9.2.删除日志
+
+请求地址：api/app/log/delete/{id}
+
+请求类型：DELETE
+
+请求参数：1
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+
+
+## 10.todoList
+
+### 10.1.查询todo列表
+
+请求地址：api/app/todo/list
+
+请求类型：GET
+
+请求参数：
+
+```json
+{
+	"key": "",
+	"days": 7,
+	"page": 1,
+	"limit": 5
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "totalCount": 1,
+        "pageSize": 5,
+        "totalPage": 1,
+        "currPage": 1,
+        "list": [
+            {
+                "id": 1,
+                "content": "完成博客后端",
+                "isDone": 0,
+                "createDate": 1654793521873
+            }
+        ]
+    }
+}
+```
+
+### 10.2.新增todo
+
+请求地址：api/app/todo/save
+
+请求类型：POST
+
+请求参数：
+
+```json
+{
+	"content": "3"
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 10.3.修改todo
+
+请求地址：api/app/todo/update
+
+请求类型：PUT
+
+请求参数：
+
+```json
+{
+	"id": "2",
+	"content": "3leetcode",
+	"done": true
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 10.3.删除todo
+
+请求地址：api/app/todo/delete/2
+
+请求类型：DELETE
+
+请求参数：2
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+
+
+## 11.友链
+
+### 11.1.查询友链列表
+
+请求地址：api/app/friendlink/list
+
+请求类型：GET
+
+请求参数：
+
+```json
+{
+	"key": "",
+	"page": 1,
+	"limit": 5
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200,
+    "data": {
+        "totalCount": 0,
+        "pageSize": 5,
+        "totalPage": 0,
+        "currPage": 1,
+        "list": []
+    }
+}
+```
+
+### 11.2.新增友链
+
+请求地址：api/app/friendlink/save
+
+请求类型：POST
+
+请求参数：
+
+```json
+{
+	"name": "百度",
+	"url": "www.baidu.com",
+	"avatar": "",
+	"siteDesc": "百度一下"
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+### 11.3.修改友链
+
+请求地址：api/app/friendlink/update
+
+请求类型：PUT
+
+请求参数：
+
+```json
+{
+	"id": "1",
+	"name": "百度",
+	"url": "www.baidu.com",
+	"avatar": "",
+	"siteDesc": "百度一下，你就知道",
+	"state": 0
+}
+```
+
+返回参数：
+
+```json
+{
+    "msg": "success",
+    "code": 200
+}
+```
+
+
+
+## 12.anime
+
+
+
+## 13.网站导航
+

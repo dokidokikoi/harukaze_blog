@@ -47,4 +47,10 @@ public class RolePermissionServiceImpl extends ServiceImpl<RolePermissionDao, Ro
         }).collect(Collectors.toList());
     }
 
+    @Override
+    public List<PermissionEntity> getPermissionListByRoleId(Long id) {
+
+        return this.baseMapper.selectPermissionListByRoleId(id);
+    }
+
 }

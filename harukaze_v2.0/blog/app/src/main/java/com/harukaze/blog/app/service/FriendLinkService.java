@@ -16,5 +16,13 @@ import java.util.Map;
 public interface FriendLinkService extends IService<FriendLinkEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    PageUtils listLinkPage(Map<String, Object> params);
+
+    void saveLink(FriendLinkEntity friendLink);
+
+    void updateLink(FriendLinkEntity param);
+
+    void removeLink(Long id);
 }
 

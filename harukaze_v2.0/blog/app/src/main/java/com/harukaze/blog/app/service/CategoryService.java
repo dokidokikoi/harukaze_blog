@@ -16,5 +16,11 @@ import java.util.Map;
 public interface CategoryService extends IService<CategoryEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    PageUtils listCategoryPage(Map<String, Object> params);
+
+    boolean removeCategoryById(Long id);
+
+    Map<String, Integer> getCategoryData(Long id);
 }
 

@@ -1,5 +1,7 @@
 package com.harukaze.blog.app.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -21,6 +23,29 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionDao, Permission
         IPage<PermissionEntity> page = this.page(
                 new Query<PermissionEntity>().getPage(params),
                 new QueryWrapper<PermissionEntity>()
+        );
+
+        return new PageUtils(page);
+    }
+
+    @Override
+    public void savePermission(PermissionEntity permission) {
+        permission.setId(null);
+        this.save(permission);
+    }
+
+    @Override
+    public PageUtils listPermissionPage(Map<String, Object> params) {
+        LambdaQueryWrapper<PermissionEntity> wrapper = new LambdaQueryWrapper<>();
+        String key = (String) params.get("key");
+
+        if (!StrUtil.isBlank(key)) {
+            wrapper.like(PermissionEntity::getName, key);
+        }
+
+        IPage<PermissionEntity> page = this.page(
+                new Query<PermissionEntity>().getPage(params),
+                wrapper
         );
 
         return new PageUtils(page);

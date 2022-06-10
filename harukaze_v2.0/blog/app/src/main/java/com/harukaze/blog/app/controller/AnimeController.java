@@ -3,12 +3,13 @@ package com.harukaze.blog.app.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.harukaze.blog.app.core.annotation.AccessLimit;
+import com.harukaze.blog.app.core.annotation.HasPermission;
+import com.harukaze.blog.app.core.annotation.LogAnnotation;
+import com.harukaze.blog.app.util.IpUtils;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.harukaze.blog.app.entity.AnimeEntity;
 import com.harukaze.blog.app.service.AnimeService;
@@ -33,18 +34,18 @@ public class AnimeController {
     /**
      * 列表
      */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
+    @GetMapping("/list")
+    public R list(@RequestBody Map<String, Object> params){
         PageUtils page = animeService.queryPage(params);
 
-        return R.ok().put("page", page);
+        return R.ok().put("data", page);
     }
 
 
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}")
+    @GetMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
 		AnimeEntity anime = animeService.getById(id);
 
@@ -54,7 +55,10 @@ public class AnimeController {
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @LogAnnotation(module = "动画", operator = "新增动画")
+    @HasPermission("anime:add")
+    @AccessLimit
+    @PostMapping("/save")
     public R save(@RequestBody AnimeEntity anime){
 		animeService.save(anime);
 
@@ -64,7 +68,10 @@ public class AnimeController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
+    @LogAnnotation(module = "动画", operator = "修改动画")
+    @HasPermission("anime:update")
+    @AccessLimit
+    @PutMapping("/update")
     public R update(@RequestBody AnimeEntity anime){
 		animeService.updateById(anime);
 
@@ -74,9 +81,12 @@ public class AnimeController {
     /**
      * 删除
      */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		animeService.removeByIds(Arrays.asList(ids));
+    @LogAnnotation(module = "动画", operator = "删除动画")
+    @HasPermission("anime:delete")
+    @AccessLimit
+    @DeleteMapping("/delete/{id}")
+    public R delete(@PathVariable("id") Long id){
+		animeService.removeById(id);
 
         return R.ok();
     }

@@ -14,7 +14,10 @@ public enum  ResponseStatus {
     LOGIN_EXPIRE(41000, "登录已过期"),
     NOT_LOGIN(40000, "未登录"),
     USER_NOT_FIND(42000, "用户不存在"),
-    USER_FORBIDDEN(42001, "权限不足，请联系管理员");
+    USER_FORBIDDEN(42001, "权限不足，请联系管理员"),
+    ARTICLE_BAD_REQEST(43000, "文章请求错误"),
+    CATEGORY_DELETE_ERR(44000, "分类下存在文章"),
+    TAG_DELETE_ERR(45000, "标签下存在文章");
 
     private Integer code;
     private String msg;

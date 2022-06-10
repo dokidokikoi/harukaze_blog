@@ -16,5 +16,7 @@ import java.util.Map;
 public interface LogService extends IService<LogEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    PageUtils listLogPage(Map<String, Object> params);
 }
 

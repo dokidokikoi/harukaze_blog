@@ -29,14 +29,14 @@ public class Query<T> {
 
     public IPage<T> getPage(Map<String, Object> params, String defaultOrderField, boolean isAsc) {
         //分页参数
-        long curPage = 1;
-        long limit = 10;
+        int curPage = 1;
+        int limit = 10;
 
         if(params.get(Constant.PAGE) != null){
-            curPage = Long.parseLong((String)params.get(Constant.PAGE));
+            curPage = (Integer) params.get(Constant.PAGE);
         }
         if(params.get(Constant.LIMIT) != null){
-            limit = Long.parseLong((String)params.get(Constant.LIMIT));
+            limit = (Integer) params.get(Constant.LIMIT);
         }
 
         //分页对象

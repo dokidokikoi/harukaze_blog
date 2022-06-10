@@ -4,6 +4,7 @@ import com.harukaze.blog.app.param.LoginParam;
 import com.harukaze.blog.app.service.LoginService;
 import com.harukaze.blog.common.utils.R;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +30,7 @@ public class LoginController {
     }
 
     @PostMapping("login")
-    public R login(LoginParam loginParam) {
+    public R login(@Validated LoginParam loginParam) {
         return loginService.login(loginParam);
     }
 

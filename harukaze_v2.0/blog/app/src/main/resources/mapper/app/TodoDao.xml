@@ -11,5 +11,20 @@
         <result property="createDate" column="create_date"/>
     </resultMap>
 
-
+    <select id="selectTodoList" resultType="TodoEntity">
+        SELECT id, content, is_done, create_date
+        FROM hk_todo
+        <where>
+            1 = 1
+            <if test="key != null">
+                AND content LIKE CONCAT('%',#{key},'%')
+            </if>
+            <if test="done != null">
+                AND is_done = #{done}
+            </if>
+            <if test="days != null">
+                AND FROM_UNIXTIME(create_date/1000) > DATE_SUB(CURDATE(), INTERVAL #{days} DAY)
+            </if>
+        </where>
+    </select>
 </mapper>

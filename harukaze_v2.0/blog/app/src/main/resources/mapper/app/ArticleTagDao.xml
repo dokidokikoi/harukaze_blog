@@ -10,5 +10,15 @@
         <result property="tagId" column="tag_id"/>
     </resultMap>
 
+    <select id="selectTagListByArticleId" resultType="TagEntity">
+        SELECT t.`id`, t.`tag_name`
+        FROM hk_tag t, hk_article_tag `at`
+        WHERE `at`.`article_id` = #{id} AND `at`.`tag_id` = t.`id`
+    </select>
 
+    <select id="selectArticleListByTagId" resultType="articleEntity">
+        select a.`id`, a.`view_counts`, a.`comment_counts`
+        from hk_article a, hk_article_tag `at`
+        where `at`.`tag_id` = #{id} and `at`.`article_id` = a.`author_id`
+    </select>
 </mapper>

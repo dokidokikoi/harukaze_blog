@@ -3,12 +3,15 @@ package com.harukaze.blog.app.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.harukaze.blog.app.core.annotation.AccessLimit;
+import com.harukaze.blog.app.core.annotation.HasPermission;
+import com.harukaze.blog.app.core.annotation.LogAnnotation;
+import com.harukaze.blog.app.param.TodoParam;
+import com.harukaze.blog.common.valid.AddGroup;
+import com.harukaze.blog.common.valid.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import com.harukaze.blog.app.entity.TodoEntity;
 import com.harukaze.blog.app.service.TodoService;
@@ -32,31 +35,42 @@ public class TodoController {
 
     /**
      * 列表
+     * {
+     * 	"key": "",
+     * 	"days": 7,
+     * 	"page": 1,
+     * 	"limit": 5
+     * }
      */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = todoService.queryPage(params);
+    @AccessLimit
+    @GetMapping("/list")
+    public R list(@RequestBody Map<String, Object> params){
+        PageUtils page = todoService.listTodoPage(params);
 
-        return R.ok().put("page", page);
+        return R.ok().put("data", page);
     }
 
 
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}")
+    @AccessLimit
+    @GetMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
 		TodoEntity todo = todoService.getById(id);
 
-        return R.ok().put("todo", todo);
+        return R.ok().put("data", todo);
     }
 
     /**
      * 保存
      */
-    @RequestMapping("/save")
-    public R save(@RequestBody TodoEntity todo){
-		todoService.save(todo);
+    @LogAnnotation(module = "代办事项", operator = "新增事项")
+//    @HasPermission("todo:add")
+    @AccessLimit
+    @PostMapping("/save")
+    public R save(@Validated(AddGroup.class) @RequestBody TodoEntity todo){
+		todoService.saveTodo(todo);
 
         return R.ok();
     }
@@ -64,9 +78,12 @@ public class TodoController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
-    public R update(@RequestBody TodoEntity todo){
-		todoService.updateById(todo);
+    @LogAnnotation(module = "代办事项", operator = "修改事项")
+//    @HasPermission("todo:update")
+    @AccessLimit
+    @PutMapping("/update")
+    public R update(@Validated(UpdateGroup.class) @RequestBody TodoParam todo){
+		todoService.updateTodo(todo);
 
         return R.ok();
     }
@@ -74,9 +91,12 @@ public class TodoController {
     /**
      * 删除
      */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		todoService.removeByIds(Arrays.asList(ids));
+    @LogAnnotation(module = "代办事项", operator = "删除事项")
+//    @HasPermission("todo:delete")
+    @AccessLimit
+    @DeleteMapping("/delete/{id}")
+    public R delete(@PathVariable("id") Long id){
+		todoService.removeById(id);
 
         return R.ok();
     }

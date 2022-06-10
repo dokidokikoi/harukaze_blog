@@ -3,12 +3,14 @@ package com.harukaze.blog.app.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.harukaze.blog.app.core.annotation.AccessLimit;
+import com.harukaze.blog.app.core.annotation.HasPermission;
+import com.harukaze.blog.app.core.annotation.LogAnnotation;
+import com.harukaze.blog.common.valid.AddGroup;
+import com.harukaze.blog.common.valid.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import com.harukaze.blog.app.entity.PermissionEntity;
 import com.harukaze.blog.app.service.PermissionService;
@@ -33,30 +35,35 @@ public class PermissionController {
     /**
      * 列表
      */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = permissionService.queryPage(params);
+    @AccessLimit
+    @GetMapping("/list")
+    public R list(@RequestBody Map<String, Object> params){
+        PageUtils page = permissionService.listPermissionPage(params);
 
-        return R.ok().put("page", page);
+        return R.ok().put("data", page);
     }
 
 
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}")
+    @AccessLimit
+    @GetMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
 		PermissionEntity permission = permissionService.getById(id);
 
-        return R.ok().put("permission", permission);
+        return R.ok().put("data", permission);
     }
 
     /**
-     * 保存
+     * 新增权限
      */
-    @RequestMapping("/save")
-    public R save(@RequestBody PermissionEntity permission){
-		permissionService.save(permission);
+    @LogAnnotation(module = "权限", operator = "新增权限")
+    @HasPermission("permission:save")
+    @AccessLimit
+    @PostMapping("/save")
+    public R save(@Validated(AddGroup.class) @RequestBody PermissionEntity permission){
+		permissionService.savePermission(permission);
 
         return R.ok();
     }
@@ -64,8 +71,11 @@ public class PermissionController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
-    public R update(@RequestBody PermissionEntity permission){
+    @LogAnnotation(module = "权限", operator = "修改权限")
+    @HasPermission("permission:update")
+    @AccessLimit
+    @PutMapping("/update")
+    public R update(@Validated(UpdateGroup.class) @RequestBody PermissionEntity permission){
 		permissionService.updateById(permission);
 
         return R.ok();
@@ -74,11 +84,11 @@ public class PermissionController {
     /**
      * 删除
      */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		permissionService.removeByIds(Arrays.asList(ids));
-
-        return R.ok();
-    }
+//    @RequestMapping("/delete")
+//    public R delete(@RequestBody Long[] ids){
+//		permissionService.removeByIds(Arrays.asList(ids));
+//
+//        return R.ok();
+//    }
 
 }

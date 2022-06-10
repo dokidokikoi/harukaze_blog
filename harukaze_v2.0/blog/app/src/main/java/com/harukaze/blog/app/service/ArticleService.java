@@ -1,6 +1,7 @@
 package com.harukaze.blog.app.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.harukaze.blog.app.param.ArticleParam;
 import com.harukaze.blog.app.vo.ArticleVo;
 import com.harukaze.blog.common.utils.PageUtils;
 import com.harukaze.blog.app.entity.ArticleEntity;
@@ -21,5 +22,13 @@ public interface ArticleService extends IService<ArticleEntity> {
     PageUtils listArticlePage(Map<String, Object> params);
 
     ArticleVo getArticleDetailById(Long id);
+
+    void saveArticleDetail(ArticleParam params);
+
+    void updateArticleById(ArticleParam params);
+
+    void setArticleStateById(Long id, boolean flag);
+
+    PageUtils getArticleArchives();
 }
 

@@ -3,12 +3,15 @@ package com.harukaze.blog.app;
 import com.harukaze.blog.app.dao.AnimeDao;
 import com.harukaze.blog.app.entity.AnimeEntity;
 import com.harukaze.blog.app.service.ArticleService;
+import com.harukaze.blog.app.util.IpUtils;
+import com.harukaze.blog.app.util.UserAgentUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,5 +42,14 @@ public class AnimeTest {
         Map<String, Object> params = new HashMap<>();
         params.put("key", "2");
         System.out.println(articleService.listArticlePage(params));
+    }
+
+    @Test
+    public void testGetIpAddress() throws IOException {
+//        System.out.println(IpUtils.getIpAddrNum("120.76.201.50"));
+//        System.out.println(IpUtils.ipToString(IpUtils.getIpAddrNum("120.76.201.50")));
+//        System.out.println(IpUtils.getIpAddress("120.76.201.50"));
+//        System.out.println(IpUtils.getCityInfo("110.52.208.189"));
+        System.out.println(new UserAgentUtils().parseOsAndBrowser("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36"));
     }
 }

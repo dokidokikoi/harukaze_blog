@@ -1,13 +1,18 @@
 package com.harukaze.blog.app.controller;
 
-import java.util.Arrays;
 import java.util.Map;
 
+import com.harukaze.blog.app.core.annotation.AccessLimit;
+import com.harukaze.blog.app.core.annotation.HasPermission;
+import com.harukaze.blog.app.core.annotation.LogAnnotation;
+import com.harukaze.blog.app.param.ArticleParam;
 import com.harukaze.blog.app.vo.ArticleVo;
+import com.harukaze.blog.common.valid.AddGroup;
+import com.harukaze.blog.common.valid.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.harukaze.blog.app.entity.ArticleEntity;
 import com.harukaze.blog.app.service.ArticleService;
 import com.harukaze.blog.common.utils.PageUtils;
 import com.harukaze.blog.common.utils.R;
@@ -42,8 +47,9 @@ public class ArticleController {
      *     }
      * }
      */
+    @LogAnnotation(module = "文章", operator = "查询文章列表")
     @GetMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestBody Map<String, Object> params){
         PageUtils page = articleService.listArticlePage(params);
 
         return R.ok().put("data", page);
@@ -53,41 +59,50 @@ public class ArticleController {
     /**
      * 查询文章详情
      */
-    @RequestMapping("/info/{id}")
+    @LogAnnotation(module = "文章", operator = "查询文章详情")
+    @GetMapping("/info/{id}")
     public R info(@PathVariable("id") Long id){
         ArticleVo article = articleService.getArticleDetailById(id);
 
-        return R.ok().put("article", article);
+        return R.ok().put("data", article);
     }
 
     /**
-     * 保存
+     * 写文章
      */
-    @RequestMapping("/save")
-    public R save(@RequestBody ArticleEntity article){
-		articleService.save(article);
+    @LogAnnotation(module = "文章", operator = "写文章")
+    @HasPermission("article:add")
+    @AccessLimit
+    @PostMapping("/save")
+    public R save(@Validated(AddGroup.class) @RequestBody ArticleParam params){
+		articleService.saveArticleDetail(params);
 
         return R.ok();
     }
 
     /**
-     * 修改
+     * 修改文章
      */
-    @RequestMapping("/update")
-    public R update(@RequestBody ArticleEntity article){
-		articleService.updateById(article);
+    @LogAnnotation(module = "文章", operator = "修改文章")
+    @HasPermission("article:update")
+    @AccessLimit
+    @PutMapping("/update")
+    public R update(@Validated(UpdateGroup.class) @RequestBody ArticleParam params){
+		articleService.updateArticleById(params);
 
         return R.ok();
     }
 
     /**
-     * 删除
+     * 设置文章状态
      */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		articleService.removeByIds(Arrays.asList(ids));
+    @LogAnnotation(module = "文章", operator = "设置文章状态")
+    @HasPermission("article:update")
+    @AccessLimit
+    @PutMapping("/set_state")
+    public R delete(Long id, boolean flag){
+		articleService.setArticleStateById(id, flag);
 
         return R.ok();
     }
-
 }

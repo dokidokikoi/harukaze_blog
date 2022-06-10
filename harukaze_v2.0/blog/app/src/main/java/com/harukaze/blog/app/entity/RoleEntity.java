@@ -6,7 +6,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.harukaze.blog.common.valid.AddGroup;
+import com.harukaze.blog.common.valid.UpdateGroup;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * 
@@ -28,6 +34,7 @@ public class RoleEntity implements Serializable {
 	/**
 	 * 角色名
 	 */
+	@NotBlank(message = "新增，roleName不能为空", groups = AddGroup.class)
 	private String roleName;
 	/**
 	 * 角色描述

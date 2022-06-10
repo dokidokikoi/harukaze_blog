@@ -56,7 +56,7 @@ public class LogEntity implements Serializable {
 	/**
 	 * 是否来自于我
 	 */
-	private Integer isMine;
+	private Long userId;
 	/**
 	 * 浏览器
 	 */
@@ -65,5 +65,7 @@ public class LogEntity implements Serializable {
 	 * 创建时间
 	 */
 	private Long createDate;
+
+	private String os;
 
 }

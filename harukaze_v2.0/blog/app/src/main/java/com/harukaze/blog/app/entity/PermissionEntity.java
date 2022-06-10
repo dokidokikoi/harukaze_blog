@@ -6,7 +6,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.harukaze.blog.common.valid.AddGroup;
+import com.harukaze.blog.common.valid.UpdateGroup;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * 
@@ -24,6 +30,7 @@ public class PermissionEntity implements Serializable {
 	 * 
 	 */
 	@TableId(type = IdType.AUTO)
+	@NotNull(message = "修改，id不能为空", groups = UpdateGroup.class)
 	private Long id;
 	/**
 	 * 路径
@@ -32,6 +39,8 @@ public class PermissionEntity implements Serializable {
 	/**
 	 * 权限名
 	 */
+	@NotBlank(message = "新增，name不能为空", groups = AddGroup.class)
+	@NotBlank(message = "修改，name不能为空", groups = UpdateGroup.class)
 	private String name;
 
 }

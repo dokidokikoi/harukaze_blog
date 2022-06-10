@@ -8,6 +8,9 @@ import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 /**
  * 
  * 
@@ -24,10 +27,12 @@ public class CommentEntity implements Serializable {
 	 * 
 	 */
 	@TableId(type = IdType.AUTO)
+	@NotNull(message = "id不能为空")
 	private Long id;
 	/**
 	 * 评论内容
 	 */
+	@NotBlank(message = "content不能为空")
 	private String content;
 	/**
 	 * 评论层级，最大为三
@@ -44,6 +49,7 @@ public class CommentEntity implements Serializable {
 	/**
 	 * 评论文章id
 	 */
+	@NotBlank(message = "articleId不能为空")
 	private Long articleId;
 	/**
 	 * 作者id
@@ -58,4 +64,9 @@ public class CommentEntity implements Serializable {
 	 */
 	private Long toUserId;
 
+	private Integer weight;
+
+	private String authorName;
+
+	private String toUserName;
 }

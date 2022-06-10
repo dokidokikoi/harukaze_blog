@@ -3,12 +3,15 @@ package com.harukaze.blog.app.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.harukaze.blog.app.core.annotation.AccessLimit;
+import com.harukaze.blog.app.core.annotation.HasPermission;
+import com.harukaze.blog.app.core.annotation.LogAnnotation;
+import com.harukaze.blog.app.vo.UserVo;
+import com.harukaze.blog.common.valid.AddGroup;
+import com.harukaze.blog.common.valid.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import com.harukaze.blog.app.entity.UserEntity;
 import com.harukaze.blog.app.service.UserService;
@@ -32,31 +35,53 @@ public class UserController {
 
     /**
      * 列表
+     * {
+     * 	"key": "",
+     * 	"page": 1,
+     * 	"limit": 5
+     * }
      */
-    @RequestMapping("/list")
+    @HasPermission("user:select")
+    @AccessLimit
+    @GetMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = userService.queryPage(params);
+        PageUtils page = userService.listUserPage(params);
 
-        return R.ok().put("page", page);
+        return R.ok().put("data", page);
     }
 
 
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}")
-    public R info(@PathVariable("id") Long id){
-		UserEntity user = userService.getById(id);
+//    @AccessLimit
+//    @GetMapping("/info/{id}")
+//    public R info(@PathVariable("id") Long id){
+//		UserVo user = userService.getUserVoById(id);
+//
+//        return R.ok().put("data", user);
+//    }
 
-        return R.ok().put("user", user);
+    /**
+    * 获取当前用户信息
+    */
+    @AccessLimit
+    @GetMapping("/info")
+    public R info(){
+		UserVo user = userService.getCurrentUser();
+
+        return R.ok().put("data", user);
     }
 
     /**
      * 保存
      */
-    @RequestMapping("/save")
-    public R save(@RequestBody UserEntity user){
-		userService.save(user);
+    @LogAnnotation(module = "用户", operator = "新增用户")
+    @HasPermission("user:add")
+    @AccessLimit
+    @PostMapping("/save")
+    public R save(@Validated(AddGroup.class) @RequestBody UserEntity user){
+		userService.saveUser(user);
 
         return R.ok();
     }
@@ -64,9 +89,12 @@ public class UserController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
-    public R update(@RequestBody UserEntity user){
-		userService.updateById(user);
+    @LogAnnotation(module = "用户", operator = "修改用户")
+    @HasPermission("user:update")
+    @AccessLimit
+    @PutMapping("/update")
+    public R update(@Validated(UpdateGroup.class) @RequestBody UserEntity user){
+		userService.updateUserById(user);
 
         return R.ok();
     }
@@ -74,11 +102,11 @@ public class UserController {
     /**
      * 删除
      */
-    @RequestMapping("/delete")
-    public R delete(@RequestBody Long[] ids){
-		userService.removeByIds(Arrays.asList(ids));
-
-        return R.ok();
-    }
+//    @RequestMapping("/delete")
+//    public R delete(@RequestBody Long[] ids){
+//		userService.removeByIds(Arrays.asList(ids));
+//
+//        return R.ok();
+//    }
 
 }
