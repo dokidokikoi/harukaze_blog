@@ -20,7 +20,7 @@ public class CommentVo {
      */
     private String content;
     /**
-     * 评论层级，最大为三
+     * 评论层级，最大为2
      */
     private Integer level;
     /**

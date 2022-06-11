@@ -48,7 +48,7 @@ public class ArticleController {
      * }
      */
     @LogAnnotation(module = "文章", operator = "查询文章列表")
-    @GetMapping("/list")
+    @PostMapping("/list")
     public R list(@RequestBody Map<String, Object> params){
         PageUtils page = articleService.listArticlePage(params);
 
@@ -104,5 +104,10 @@ public class ArticleController {
 		articleService.setArticleStateById(id, flag);
 
         return R.ok();
+    }
+
+    @GetMapping("/count")
+    public R getTotalCount() {
+        return R.ok().put("data", articleService.count());
     }
 }

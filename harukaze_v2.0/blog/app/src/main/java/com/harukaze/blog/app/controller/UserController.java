@@ -109,4 +109,9 @@ public class UserController {
 //        return R.ok();
 //    }
 
+    @GetMapping("/count")
+    public R getTotalCount() {
+        return R.ok().put("data", userService.count());
+    }
+
 }

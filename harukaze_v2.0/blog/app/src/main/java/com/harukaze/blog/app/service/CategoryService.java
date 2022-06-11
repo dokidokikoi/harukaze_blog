@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.harukaze.blog.common.utils.PageUtils;
 import com.harukaze.blog.app.entity.CategoryEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,6 +22,6 @@ public interface CategoryService extends IService<CategoryEntity> {
 
     boolean removeCategoryById(Long id);
 
-    Map<String, Integer> getCategoryData(Long id);
+    List<Map<String, Object>> getCategoryData();
 }
 

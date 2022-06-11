@@ -148,6 +148,17 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
         this.baseMapper.updateById(commentEntity);
     }
 
+    @Override
+    public Object countComment(Long id) {
+        LambdaQueryWrapper<CommentEntity> wrapper = new LambdaQueryWrapper<>();
+        if (id == 0) {
+            wrapper.isNull(CommentEntity::getArticleId);
+        } else {
+            wrapper.eq(CommentEntity::getArticleId, id);
+        }
+        return this.baseMapper.selectCount(wrapper);
+    }
+
     private List<CommentVo> findChildren(CommentEntity parent) {
         List<CommentEntity> list = this.baseMapper.selectList(
                 new LambdaQueryWrapper<CommentEntity>()

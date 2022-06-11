@@ -1,6 +1,7 @@
 package com.harukaze.blog.app.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.harukaze.blog.app.core.annotation.AccessLimit;
@@ -108,11 +109,16 @@ public class TagController {
     /**
      * 查询标签下的文章、评论、观看数
      */
-    @GetMapping("/{id}/articles")
-    public R getTagData(@PathVariable("id") Long id){
-        Map<String, Integer> data = articleTagService.getData(id);
+    @GetMapping("/articles")
+    public R getTagData(){
+        List<Map<String, Object>> data = articleTagService.getData();
 
         return R.ok().put("data", data);
+    }
+
+    @GetMapping("/count")
+    public R getTotalCount() {
+        return R.ok().put("data", tagService.count());
     }
 
 }

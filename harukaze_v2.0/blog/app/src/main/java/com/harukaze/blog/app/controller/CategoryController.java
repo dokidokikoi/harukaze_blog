@@ -1,6 +1,7 @@
 package com.harukaze.blog.app.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.harukaze.blog.app.core.annotation.AccessLimit;
@@ -43,7 +44,7 @@ public class CategoryController {
      * }
      */
     @GetMapping("/list")
-    public R list(@RequestBody Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params){
         PageUtils page = categoryService.listCategoryPage(params);
 
         return R.ok().put("data", page);
@@ -103,11 +104,16 @@ public class CategoryController {
     /**
      * 查询分类下的文章、评论、观看数
      */
-    @GetMapping("/{id}/articles")
-    public R getCategoryData(@PathVariable("id") Long id){
-        Map<String, Integer> data = categoryService.getCategoryData(id);
+    @GetMapping("/articles")
+    public R getCategoryData(){
+        List<Map<String, Object>> data = categoryService.getCategoryData();
 
         return R.ok().put("data", data);
+    }
+
+    @GetMapping("/count")
+    public R getTotalCount() {
+        return R.ok().put("data", categoryService.count());
     }
 
 }

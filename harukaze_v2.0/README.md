@@ -114,7 +114,7 @@
 ```json
 {
 	"key": "summer",	// 文章标题关键字，标签名，分类名
-    "category": "1",	// 分类 id
+    "categoryId": "1",	// 分类 id
     "tags": [1, 3],		// 标签 id 
     "limit": 10,		// 分页大小
     "page": 1,			// 当前页

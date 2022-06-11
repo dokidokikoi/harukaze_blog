@@ -40,7 +40,7 @@ public class FriendLinkController {
      * }
      */
     @GetMapping("/list")
-    public R list(@RequestBody Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params){
         PageUtils page = friendLinkService.listLinkPage(params);
 
         return R.ok().put("data", page);
@@ -95,5 +95,10 @@ public class FriendLinkController {
 //
 //        return R.ok();
 //    }
+
+    @GetMapping("/count")
+    public R getTotalCount() {
+        return R.ok().put("data", friendLinkService.count());
+    }
 
 }

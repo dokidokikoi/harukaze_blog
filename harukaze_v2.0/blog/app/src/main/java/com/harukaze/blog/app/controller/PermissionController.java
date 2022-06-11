@@ -34,10 +34,15 @@ public class PermissionController {
 
     /**
      * 列表
+     * {
+     * 	"key": "",
+     * 	"page": 1,
+     * 	"limit": 10
+     * }
      */
     @AccessLimit
     @GetMapping("/list")
-    public R list(@RequestBody Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params){
         PageUtils page = permissionService.listPermissionPage(params);
 
         return R.ok().put("data", page);
@@ -90,5 +95,10 @@ public class PermissionController {
 //
 //        return R.ok();
 //    }
+
+    @GetMapping("/count")
+    public R getTotalCount() {
+        return R.ok().put("data", permissionService.count());
+    }
 
 }

@@ -103,6 +103,9 @@ public class IpUtils {
 
     public static Long getIpAddrNum(HttpServletRequest request) {
         String ipAddr = getIpAddr(request);
+        if ("0:0:0:0:0:0:0:1".equals(ipAddr) || StrUtil.isBlank(ipAddr)) {
+            return 0L;
+        }
         String[] split = ipAddr.split("\\.");
         long ipNum = 0;
         for (int i = 3; i >= 0; i--) {

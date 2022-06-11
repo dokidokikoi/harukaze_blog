@@ -91,4 +91,14 @@ public class CommentController {
 //        return R.ok();
 //    }
 
+    @GetMapping("/count/{id}")
+    public R getTotalCountByArticleId(@PathVariable("id") Long id) {
+        return R.ok().put("data", commentService.countComment(id));
+    }
+
+    @GetMapping("/count")
+    public R getTotalCount() {
+        return R.ok().put("data", commentService.count());
+    }
+
 }

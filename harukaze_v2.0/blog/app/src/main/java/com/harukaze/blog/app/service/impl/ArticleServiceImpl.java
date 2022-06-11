@@ -67,15 +67,15 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, ArticleEntity> i
         // 分类 id
         Long categoryId = null;
         try {
-            categoryId = Long.parseLong((String) params.get("categoryId"));
+            categoryId = ((Integer) params.get("categoryId")).longValue();
         } catch (Exception e) {
 
         }
         // 标签列表
         List<Long> tags = null;
         try {
-            tags = ((List<String>) params.get("categoryId")).stream()
-                    .map(Long::parseLong).collect(Collectors.toList());
+            tags = ((List<Integer>) params.get("tags")).stream()
+                    .map(item -> item.longValue()).collect(Collectors.toList());
         } catch (Exception e) {
 
         }

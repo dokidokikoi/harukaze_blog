@@ -44,7 +44,7 @@ public class RoleController {
      */
     @AccessLimit
     @GetMapping("/list")
-    public R list(@RequestBody Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params){
         PageUtils page = roleService.listRolePage(params);
 
         return R.ok().put("data", page);
@@ -97,5 +97,10 @@ public class RoleController {
 //
 //        return R.ok();
 //    }
+
+    @GetMapping("/count")
+    public R getTotalCount() {
+        return R.ok().put("data", roleService.count());
+    }
 
 }

@@ -44,7 +44,7 @@ public class TodoController {
      */
     @AccessLimit
     @GetMapping("/list")
-    public R list(@RequestBody Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params){
         PageUtils page = todoService.listTodoPage(params);
 
         return R.ok().put("data", page);
@@ -99,6 +99,11 @@ public class TodoController {
 		todoService.removeById(id);
 
         return R.ok();
+    }
+
+    @GetMapping("/count")
+    public R getTotalCount() {
+        return R.ok().put("data", todoService.count());
     }
 
 }

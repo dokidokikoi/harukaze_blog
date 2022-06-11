@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -46,20 +48,27 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagDao, ArticleTag
     }
 
     @Override
-    public Map<String, Integer> getData(Long id) {
-        List<ArticleEntity> articleEntities = this.baseMapper.selectArticleListByTagId(id);
-        Map<String, Integer> data = new HashMap<>();
+    public List<Map<String, Object>> getData() {
+        List<ArticleTagEntity> entities = this.baseMapper.selectList(null);
 
-        int viewCount = 0, commentCount = 0;
-        for (ArticleEntity articleEntity : articleEntities) {
-            viewCount += articleEntity.getViewCounts();
-            commentCount += articleEntity.getCommentCounts();
-        }
+        List<Map<String, Object>> collect = entities.stream().map(item -> {
+            List<ArticleEntity> articleEntities = this.baseMapper.selectArticleListByTagId(item.getId());
+            Map<String, Object> map = new HashMap<>();
 
-        data.put("articleCount", articleEntities.size());
-        data.put("viewCount", viewCount);
-        data.put("commentCount", commentCount);
-        return data;
+            int viewCount = 0, commentCount = 0;
+            for (ArticleEntity articleEntity : articleEntities) {
+                viewCount += articleEntity.getViewCounts();
+                commentCount += articleEntity.getCommentCounts();
+            }
+
+            map.put("tag", item);
+            map.put("articleCount", articleEntities.size());
+            map.put("viewCount", viewCount);
+            map.put("commentCount", commentCount);
+
+            return map;
+        }).collect(Collectors.toList());
+        return collect;
     }
 
 }

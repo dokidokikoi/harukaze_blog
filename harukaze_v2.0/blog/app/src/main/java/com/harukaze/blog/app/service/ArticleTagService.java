@@ -23,6 +23,6 @@ public interface ArticleTagService extends IService<ArticleTagEntity> {
 
     List<TagEntity> getTagsByArticleId(Long id);
 
-    Map<String, Integer> getData(Long id);
+    List<Map<String, Object>> getData();
 }
 

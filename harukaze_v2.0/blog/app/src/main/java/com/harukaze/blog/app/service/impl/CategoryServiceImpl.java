@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -69,22 +71,28 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     @Override
-    public Map<String, Integer> getCategoryData(Long id) {
-        Map<String, Integer> data = new HashMap<>();
-        List<ArticleEntity> list = articleService.list(
-                new LambdaQueryWrapper<ArticleEntity>()
-                        .eq(ArticleEntity::getCategoryId, id));
-        int viewCount = 0, commentCount = 0;
-        for (ArticleEntity articleEntity : list) {
-            viewCount += articleEntity.getViewCounts();
-            commentCount += articleEntity.getCommentCounts();
-        }
+    public List<Map<String, Object>> getCategoryData( ) {
+        List<CategoryEntity> entities = this.baseMapper.selectList(null);
 
-        data.put("articleCount", list.size());
-        data.put("viewCount", viewCount);
-        data.put("commentCount", commentCount);
+        List<Map<String, Object>> collect = entities.stream().map(item -> {
+            Map<String, Object> map = new HashMap<>();
+            List<ArticleEntity> list = articleService.list(
+                    new LambdaQueryWrapper<ArticleEntity>()
+                            .eq(ArticleEntity::getCategoryId, item.getId()));
+            int viewCount = 0, commentCount = 0;
+            for (ArticleEntity articleEntity : list) {
+                viewCount += articleEntity.getViewCounts();
+                commentCount += articleEntity.getCommentCounts();
+            }
 
-        return data;
+            map.put("category", item);
+            map.put("articleCount", list.size());
+            map.put("viewCount", viewCount);
+            map.put("commentCount", commentCount);
+            return map;
+        }).collect(Collectors.toList());
+
+        return collect;
     }
 
 }

@@ -23,5 +23,7 @@ public interface CommentService extends IService<CommentEntity> {
     void saveComment(CommentParam param);
 
     void updateComment(CommentEntity comment) throws Exception;
+
+    Object countComment(Long id);
 }
 
