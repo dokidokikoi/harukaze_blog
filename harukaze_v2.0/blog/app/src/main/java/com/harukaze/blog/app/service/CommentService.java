@@ -1,6 +1,7 @@
 package com.harukaze.blog.app.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.harukaze.blog.app.handler.exception.ArticleNotFoundException;
 import com.harukaze.blog.app.param.CommentParam;
 import com.harukaze.blog.common.utils.PageUtils;
 import com.harukaze.blog.app.entity.CommentEntity;
@@ -18,12 +19,14 @@ public interface CommentService extends IService<CommentEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
 
-    PageUtils listCommentPage(Long articleId,  Map<String, Object> params);
+    PageUtils listCommentPage(Long articleId,  Map<String, Object> params) throws ArticleNotFoundException;
 
     void saveComment(CommentParam param);
 
     void updateComment(CommentEntity comment) throws Exception;
 
     Object countComment(Long id);
+
+    void setCommentState(Long id, boolean flag);
 }
 

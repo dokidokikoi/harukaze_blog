@@ -25,7 +25,6 @@ public class CommentParam {
     /**
      * 评论文章id
      */
-    @NotNull(message = "新增，articleId不能为空", groups = AddGroup.class)
     private Long articleId;
     /**
      * 作者信息

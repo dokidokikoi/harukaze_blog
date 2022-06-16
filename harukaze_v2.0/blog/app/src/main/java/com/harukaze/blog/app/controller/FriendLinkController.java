@@ -50,18 +50,18 @@ public class FriendLinkController {
     /**
      * 信息
      */
-    @GetMapping("/info/{id}")
-    public R info(@PathVariable("id") Long id){
-		FriendLinkEntity friendLink = friendLinkService.getById(id);
-
-        return R.ok().put("data", friendLink);
-    }
+//    @GetMapping("/info/{id}")
+//    public R info(@PathVariable("id") Long id){
+//		FriendLinkEntity friendLink = friendLinkService.getById(id);
+//
+//        return R.ok().put("data", friendLink);
+//    }
 
     /**
      * 新增友链
      */
     @LogAnnotation(module = "友链", operator = "新增友链")
-//    @HasPermission("link:add")
+    @HasPermission("link:add")
     @AccessLimit
     @PostMapping("/save")
     public R save(@Validated(AddGroup.class) @RequestBody FriendLinkEntity friendLink){
@@ -74,11 +74,21 @@ public class FriendLinkController {
      * 修改
      */
     @LogAnnotation(module = "友链", operator = "修改友链")
-//    @HasPermission("link:update")
+    @HasPermission("link:update")
     @AccessLimit
     @PutMapping("/update")
     public R update(@Validated(UpdateGroup.class) @RequestBody FriendLinkEntity param){
 		friendLinkService.updateLink(param);
+
+        return R.ok();
+    }
+
+    @LogAnnotation(module = "友链", operator = "修改友链状态")
+    @HasPermission("link:update")
+    @AccessLimit
+    @PutMapping("/set_state")
+    public R setState(Long id, boolean flag){
+        friendLinkService.setLinkState(id, flag);
 
         return R.ok();
     }

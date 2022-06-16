@@ -9,6 +9,14 @@
     >
       <template #default="{row}">
         <el-divider content-position="left">
+          简介
+        </el-divider>
+        <el-card style="width: 90%; margin: auto;">
+          <p>
+            {{ row.summary }}
+          </p>
+        </el-card>
+        <el-divider content-position="left">
           category
         </el-divider>
         <el-tag
@@ -29,6 +37,13 @@
         >
           {{ item.tagName }}
         </el-tag>
+        <el-divider content-position="left">
+          文章评论
+        </el-divider>
+        <app-comment
+          style="width: 80%; margin: auto"
+          :article-id="row.id"
+        />
       </template>
     </el-table-column>
     <el-table-column
@@ -41,28 +56,20 @@
       label="标题"
     />
     <el-table-column
-      prop="summary"
-      label="简介"
-    />
-    <el-table-column
       prop="viewCounts"
       label="浏览数"
-      width="90px"
     />
     <el-table-column
       prop="commentCounts"
       label="评论数"
-      width="90px"
     />
     <el-table-column
       prop="weight"
       label="权重"
-      width="60px"
     />
     <el-table-column
       prop="weight"
       label="作者"
-      width="80px"
     >
       <template #default="{ row }">
         <span>{{ row.author.nickname }}</span>
@@ -71,17 +78,19 @@
     <el-table-column
       prop="weight"
       label="创建时间"
+      width="150px"
     >
       <template #default="{ row }">
-        <span>{{ row.createDate }}</span>
+        <span>{{ formatDate(row.createDate) }}</span>
       </template>
     </el-table-column>
     <el-table-column
       prop="weight"
       label="更新时间"
+      width="150px"
     >
       <template #default="{ row }">
-        <span>{{ row.updateDate }}</span>
+        <span>{{ formatDate(row.updateDate) }}</span>
       </template>
     </el-table-column>
     <el-table-column
@@ -106,14 +115,41 @@
       label="操作"
       fixed="right"
       align="center"
-      width="100"
+      width="60"
     >
       <template #default="{ row }">
-        <el-button
-          @click="toEditPage(row.id)"
+        <el-tooltip
+          effect="dark"
+          content="编辑文章"
+          placement="top-start"
         >
-          编辑
-        </el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click="toEditPage(row.id)"
+          >
+            <el-icon><Edit /></el-icon>
+          </el-button>
+        </el-tooltip>
+        <el-tooltip
+          effect="dark"
+          content="置顶文章"
+          placement="bottom-start"
+        >
+          <el-badge
+            is-dot
+            :hidden="row.weight === 1"
+          >
+            <el-button
+              type="info"
+              size="small"
+              @click="fixedTop(row.id, row.weight)"
+              style="margin: 0;"
+            >
+              <el-icon><Star /></el-icon>
+            </el-button>
+          </el-badge>
+        </el-tooltip>
       </template>
     </el-table-column>
   </el-table>
@@ -125,6 +161,7 @@ import * as articleApi from '@/api/article'
 import { PropType, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
+import { formatDate } from '@/utils/time'
 
 const props = defineProps({
   // eslint-disable-next-line vue/require-default-prop
@@ -159,6 +196,22 @@ const handleUpdateStatus = async (article: IArticleDetail) => {
 
 const toEditPage = (id: string) => {
   router.push('/admin/article/edit/' + id)
+}
+
+const fixedTop = async (id: string, weight: number) => {
+  const data = await articleApi.fixedTop({
+    id,
+    weight: weight === 1 ? 10 : 1
+  })
+
+  if (data.code === 200) {
+    if (weight === 1) {
+      ElMessage.success('置顶成功')
+    } else {
+      ElMessage.info('取消置顶')
+    }
+    props.loadList()
+  }
 }
 
 </script>

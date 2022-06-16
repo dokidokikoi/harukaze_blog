@@ -71,7 +71,7 @@ public class CategoryController {
     public R save(@Validated(AddGroup.class) @RequestBody CategoryEntity category){
 		categoryService.save(category);
 
-        return R.ok();
+        return R.ok().put("data", category);
     }
 
     /**

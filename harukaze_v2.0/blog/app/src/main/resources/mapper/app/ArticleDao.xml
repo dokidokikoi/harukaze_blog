@@ -40,6 +40,9 @@
             OR c.`category_name` LIKE CONCAT('%',#{key},'%')
             OR t.`tag_name` LIKE CONCAT('%',#{key},'%'))
         </if>
+        <if test="userVo == null" >
+            AND state = 0
+        </if>
         ORDER BY
         <if test="time != null">
             create_date #{time},

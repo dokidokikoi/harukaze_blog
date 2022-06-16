@@ -4,6 +4,7 @@
 import request from '@/utils/request'
 import { ILoginInfo } from './types/common'
 import { IUserVo } from './types/user'
+import { IInfo } from '@/api/types/common'
 
 interface logData {
   token: string
@@ -34,5 +35,19 @@ export const logout = () => {
   return request({
     method: 'POST',
     url: 'logout'
+  })
+}
+
+export const policy = () => {
+  return request({
+    method: 'POST',
+    url: 'oss/policy'
+  })
+}
+
+export const getInfo = () => {
+  return request<IInfo>({
+    method: 'GET',
+    url: 'info'
   })
 }

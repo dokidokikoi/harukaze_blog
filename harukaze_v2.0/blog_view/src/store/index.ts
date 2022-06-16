@@ -11,7 +11,9 @@ interface IUserInfo {
 // 为 store state 声明类型
 const state = {
   isCollapse: false,
-  user: getItem<{ token: string} & IUser>('user') as unknown as IUserInfo
+  user: getItem<{ token: string} & IUser>('user') as unknown as IUserInfo,
+  articleType: 'writeArticle',
+  isLoading: false
 }
 
 export type State = typeof state
@@ -28,6 +30,12 @@ export const store = createStore<State>({
     setUser (state, playload) {
       state.user = playload
       setItem('user', state.user)
+    },
+    setArticleType (state, type) {
+      state.articleType = type
+    },
+    loading (state, flag) {
+      state.isLoading = flag
     }
   }
 })

@@ -24,6 +24,6 @@ export interface IUserVo {
   nickname: string
   state: number
   summary: string
-  role: IRole[]
+  roles: IRole[]
   permissions: IPermission[]
 }

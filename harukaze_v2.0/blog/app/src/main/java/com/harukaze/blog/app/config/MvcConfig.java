@@ -1,5 +1,6 @@
 package com.harukaze.blog.app.config;
 
+import com.harukaze.blog.app.interceptor.AccessLimitInterceptor;
 import com.harukaze.blog.app.interceptor.JwtInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,9 @@ public class MvcConfig implements WebMvcConfigurer {
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
+    @Autowired
+    private AccessLimitInterceptor accessLimitInterceptor;
+
     @Override
     public void configureAsyncSupport(AsyncSupportConfigurer configurer){
         configurer.setTaskExecutor(new ConcurrentTaskExecutor(Executors.newFixedThreadPool(3)));
@@ -42,6 +46,9 @@ public class MvcConfig implements WebMvcConfigurer {
         //排除拦截，除了登录(此时还没token)，其他都拦截
         excludePath.add("/app/login");
         excludePath.add("/app/captcha");
+
+        registry.addInterceptor(accessLimitInterceptor)
+                .addPathPatterns("/**");
 
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/app/**")

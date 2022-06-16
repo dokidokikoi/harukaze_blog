@@ -10,7 +10,7 @@ const routes: RouteRecordRaw = {
   children: [
     {
       path: 'blog',
-      name: 'blog',
+      name: 'bloglist',
       meta: {
         title: '文章列表'
       },

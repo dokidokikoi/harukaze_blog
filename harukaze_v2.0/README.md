@@ -346,12 +346,7 @@
 		"content": "test from postman",
 		"contentHtml": "<h1>test from postman</h1>"
 	},
-	"category": {
-		"id": "1",
-		"avatar": "",
-		"categoryName": "",
-		"categoryDesc": ""
-	},
+	"categoryId": "1",
 	"tags": [
 		{
 			"id": "1"

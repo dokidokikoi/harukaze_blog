@@ -8,10 +8,11 @@ export const getItem = <T>(key: string) => {
   }
 }
 
-export const setItem = (key: string, value: object | string | null) => {
+export const setItem = (key: string, value: object | string | null | undefined) => {
   if (typeof value === 'object') {
     value = JSON.stringify(value)
   }
+  if (typeof value === 'undefined') return
   window.localStorage.setItem(key, value)
 }
 

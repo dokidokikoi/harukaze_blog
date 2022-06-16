@@ -12,7 +12,6 @@ request.interceptors.request.use(function (config) {
   // 统一设置用户身份 token
   const user = store.state.user
   if (config && config.headers) {
-    config.headers['Content-Type'] = 'application/json'
     if (user && user.token) {
       config.headers.Authorization = user.token
     }

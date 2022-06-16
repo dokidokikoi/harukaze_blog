@@ -35,7 +35,7 @@ public class CommentEntity implements Serializable {
 	@NotBlank(message = "content不能为空")
 	private String content;
 	/**
-	 * 评论层级，最大为三
+	 * 评论层级，最大为二
 	 */
 	private Integer level;
 	/**

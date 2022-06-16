@@ -6,6 +6,7 @@ import java.util.Map;
 import com.harukaze.blog.app.core.annotation.AccessLimit;
 import com.harukaze.blog.app.core.annotation.HasPermission;
 import com.harukaze.blog.app.core.annotation.LogAnnotation;
+import com.harukaze.blog.app.handler.exception.ArticleNotFoundException;
 import com.harukaze.blog.app.param.CommentParam;
 import com.harukaze.blog.common.valid.AddGroup;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class CommentController {
      * 如果文章id为0，则是留言
      */
     @GetMapping("/list/{articleId}")
-    public R list(@PathVariable("articleId") Long articleId, @RequestBody Map<String, Object> params){
+    public R list(@PathVariable("articleId") Long articleId,@RequestParam Map<String, Object> params) throws ArticleNotFoundException {
         PageUtils page = commentService.listCommentPage(articleId, params);
 
         return R.ok().put("data", page);
@@ -76,6 +77,16 @@ public class CommentController {
     @PutMapping("/update")
     public R update(@Validated @RequestBody CommentEntity comment) throws Exception {
 		commentService.updateComment(comment);
+
+        return R.ok();
+    }
+
+    @LogAnnotation(module = "评论", operator = "修改评论状态")
+    @HasPermission("comment:update")
+    @AccessLimit
+    @PutMapping("/set_state")
+    public R setState(Long id, boolean flag) {
+        commentService.setCommentState(id, flag);
 
         return R.ok();
     }

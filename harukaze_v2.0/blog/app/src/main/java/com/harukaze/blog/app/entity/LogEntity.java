@@ -28,7 +28,7 @@ public class LogEntity implements Serializable {
 	/**
 	 * ip
 	 */
-	private Long ip;
+	private Long ipId;
 	/**
 	 * 模块
 	 */
@@ -60,12 +60,12 @@ public class LogEntity implements Serializable {
 	/**
 	 * 浏览器
 	 */
-	private String browser;
+	private Long browserId;
 	/**
 	 * 创建时间
 	 */
 	private Long createDate;
 
-	private String os;
+	private Long osId;
 
 }

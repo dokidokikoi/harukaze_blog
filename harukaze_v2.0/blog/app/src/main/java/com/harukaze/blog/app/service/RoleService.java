@@ -26,5 +26,9 @@ public interface RoleService extends IService<RoleEntity> {
     void updateRole(RoleParam param);
 
     void saveRole(RoleEntity role);
+
+    boolean removeRoleById(Long id);
+
+    void setPermission(Long id, Long[] ids);
 }
 

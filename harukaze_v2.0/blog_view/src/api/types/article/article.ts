@@ -7,6 +7,7 @@ export interface IArticleBody {
   content: string
   contentHtml: string
   articleId: string
+  catalog: string
 }
 
 export interface IArticleDetail {
@@ -34,8 +35,8 @@ export interface IArticleParam {
   weight: number
   state: number
   body: IArticleBody
-  category: ICategory
-  tags: ITag[]
+  categoryId: ''
+  tags: string[]
 }
 
 export interface ISearchParam {

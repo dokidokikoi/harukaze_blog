@@ -66,7 +66,7 @@ public class TodoController {
      * 保存
      */
     @LogAnnotation(module = "代办事项", operator = "新增事项")
-//    @HasPermission("todo:add")
+    @HasPermission("todo:add")
     @AccessLimit
     @PostMapping("/save")
     public R save(@Validated(AddGroup.class) @RequestBody TodoEntity todo){
@@ -79,7 +79,7 @@ public class TodoController {
      * 修改
      */
     @LogAnnotation(module = "代办事项", operator = "修改事项")
-//    @HasPermission("todo:update")
+    @HasPermission("todo:update")
     @AccessLimit
     @PutMapping("/update")
     public R update(@Validated(UpdateGroup.class) @RequestBody TodoParam todo){
@@ -92,7 +92,7 @@ public class TodoController {
      * 删除
      */
     @LogAnnotation(module = "代办事项", operator = "删除事项")
-//    @HasPermission("todo:delete")
+    @HasPermission("todo:delete")
     @AccessLimit
     @DeleteMapping("/delete/{id}")
     public R delete(@PathVariable("id") Long id){

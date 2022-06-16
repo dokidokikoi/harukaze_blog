@@ -76,7 +76,7 @@ public class TagController {
     public R save(@Validated(AddGroup.class) @RequestBody TagEntity tag){
 		tagService.save(tag);
 
-        return R.ok();
+        return R.ok().put("data", tag);
     }
 
     /**

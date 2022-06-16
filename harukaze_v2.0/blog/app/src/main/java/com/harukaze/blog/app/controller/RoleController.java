@@ -8,6 +8,7 @@ import com.harukaze.blog.app.core.annotation.HasPermission;
 import com.harukaze.blog.app.core.annotation.LogAnnotation;
 import com.harukaze.blog.app.param.RoleParam;
 import com.harukaze.blog.app.vo.RoleVo;
+import com.harukaze.blog.common.constant.ResponseStatus;
 import com.harukaze.blog.common.valid.AddGroup;
 import com.harukaze.blog.common.valid.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,14 +90,27 @@ public class RoleController {
     }
 
     /**
+     * 分配权限
+     */
+    @LogAnnotation(module = "角色", operator = "分配权限")
+    @HasPermission("role:update")
+    @AccessLimit
+    @PutMapping("/set_permission/{id}")
+    public R setPermission(@PathVariable("id") Long id, @RequestBody Long[] ids){
+        roleService.setPermission(id, ids);
+
+        return R.ok();
+    }
+
+    /**
      * 删除
      */
-//    @RequestMapping("/delete")
-//    public R delete(@RequestBody Long[] ids){
-//		roleService.removeByIds(Arrays.asList(ids));
-//
-//        return R.ok();
-//    }
+    @DeleteMapping("/delete/{id}")
+    public R delete(@PathVariable("id") Long id){
+		boolean flag = roleService.removeRoleById(id);
+
+        return flag ? R.ok() : R.error(ResponseStatus.ROLE_DELETE_ERR.getCode(), ResponseStatus.ROLE_DELETE_ERR.getMsg());
+    }
 
     @GetMapping("/count")
     public R getTotalCount() {

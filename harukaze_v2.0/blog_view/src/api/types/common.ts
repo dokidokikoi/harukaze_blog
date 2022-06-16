@@ -1,3 +1,5 @@
+import { IUserVo } from './user'
+
 export interface ILoginInfo {
   logo_square: string
   logo_rectangle: string
@@ -29,4 +31,12 @@ export interface IResp<T> {
   code: number
   msg: string
   data: T
+}
+
+export interface IInfo {
+  id: string
+  host: IUserVo
+  summary: string
+  connect: string
+  oneWord: string
 }

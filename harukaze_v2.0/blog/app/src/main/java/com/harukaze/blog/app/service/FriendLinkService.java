@@ -24,5 +24,7 @@ public interface FriendLinkService extends IService<FriendLinkEntity> {
     void updateLink(FriendLinkEntity param);
 
     void removeLink(Long id);
+
+    void setLinkState(Long id, boolean flag);
 }
 

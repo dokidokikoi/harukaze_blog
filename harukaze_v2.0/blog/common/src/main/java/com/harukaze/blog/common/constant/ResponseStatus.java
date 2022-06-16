@@ -16,8 +16,10 @@ public enum  ResponseStatus {
     USER_NOT_FIND(42000, "用户不存在"),
     USER_FORBIDDEN(42001, "权限不足，请联系管理员"),
     ARTICLE_BAD_REQEST(43000, "文章请求错误"),
+    ARTICLE_NOT_FOUND(43001, "找不到文章"),
     CATEGORY_DELETE_ERR(44000, "分类下存在文章"),
-    TAG_DELETE_ERR(45000, "标签下存在文章");
+    TAG_DELETE_ERR(45000, "标签下存在文章"),
+    ROLE_DELETE_ERR(46000, "角色下存在权限或用户");
 
     private Integer code;
     private String msg;

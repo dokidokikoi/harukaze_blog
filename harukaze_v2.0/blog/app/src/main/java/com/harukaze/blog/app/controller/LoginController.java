@@ -1,6 +1,8 @@
 package com.harukaze.blog.app.controller;
 
+import com.harukaze.blog.app.core.annotation.AccessLimit;
 import com.harukaze.blog.app.param.LoginParam;
+import com.harukaze.blog.app.service.BlogInfoService;
 import com.harukaze.blog.app.service.LoginService;
 import com.harukaze.blog.common.utils.R;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 public class LoginController {
 
     @Autowired
+    private BlogInfoService blogInfoService;
+
+    @Autowired
     private LoginService loginService;
 
     @GetMapping("captcha")
@@ -34,9 +39,15 @@ public class LoginController {
         return loginService.login(loginParam);
     }
 
+    @AccessLimit
     @PostMapping("logout")
     public R logout(HttpServletRequest request) {
         System.out.println("hello");
         return loginService.logout(request);
+    }
+
+    @GetMapping("info")
+    public R getHostInfo() {
+        return R.ok().put("data", blogInfoService.getinfo());
     }
 }

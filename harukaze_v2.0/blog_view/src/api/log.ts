@@ -1,9 +1,9 @@
 import request from '@/utils/request'
-import { ICommonParam, IPage, IResp } from './types/common'
+import { ICommonParam, IPage } from './types/common'
 import { ILog } from './types/log'
 
 export const getlogList = (params: ICommonParam) => {
-  return request<IResp<IPage<ILog>>>({
+  return request<IPage<ILog>>({
     method: 'GET',
     url: 'log/list',
     params

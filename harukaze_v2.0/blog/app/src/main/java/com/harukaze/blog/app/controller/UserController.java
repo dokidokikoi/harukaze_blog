@@ -3,10 +3,12 @@ package com.harukaze.blog.app.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.harukaze.blog.app.core.annotation.AccessLimit;
 import com.harukaze.blog.app.core.annotation.HasPermission;
 import com.harukaze.blog.app.core.annotation.LogAnnotation;
 import com.harukaze.blog.app.vo.UserVo;
+import com.harukaze.blog.common.constant.UserConstant;
 import com.harukaze.blog.common.valid.AddGroup;
 import com.harukaze.blog.common.valid.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +97,36 @@ public class UserController {
     @PutMapping("/update")
     public R update(@Validated(UpdateGroup.class) @RequestBody UserEntity user){
 		userService.updateUserById(user);
+
+        return R.ok();
+    }
+
+    /**
+     * 修改用户状态
+     */
+    @LogAnnotation(module = "用户", operator = "修改用户状态")
+    @HasPermission("user:update")
+    @AccessLimit
+    @PutMapping("/set_state")
+    public R setState(Long id, boolean flag){
+        userService.update(null,
+                new LambdaUpdateWrapper<UserEntity>()
+                        .eq(UserEntity::getId, id)
+                        .set(UserEntity::getState, flag ?
+                                UserConstant.Status.USER_UP.getCode() : UserConstant.Status.USER_DOWN.getCode()));
+
+        return R.ok();
+    }
+
+    /**
+     * 分配角色
+     */
+    @LogAnnotation(module = "用户", operator = "分配角色")
+    @HasPermission("user:update")
+    @AccessLimit
+    @PutMapping("/set_role/{id}")
+    public R setRole(@PathVariable("id") Long id, @RequestBody Long[] ids){
+        userService.setRoles(id, ids);
 
         return R.ok();
     }

@@ -1,11 +1,13 @@
 package com.harukaze.blog.app.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.harukaze.blog.app.core.annotation.AccessLimit;
 import com.harukaze.blog.app.core.annotation.HasPermission;
 import com.harukaze.blog.app.core.annotation.LogAnnotation;
+import com.harukaze.blog.app.vo.PermissionVo;
 import com.harukaze.blog.common.valid.AddGroup;
 import com.harukaze.blog.common.valid.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,17 +50,25 @@ public class PermissionController {
         return R.ok().put("data", page);
     }
 
+    @AccessLimit
+    @GetMapping("/permission_tree")
+    public R getTree() {
+        List<PermissionVo> permissionTree = permissionService.getPermissionTree();
+
+        return R.ok().put("data", permissionTree);
+    }
+
 
     /**
      * 信息
      */
-    @AccessLimit
-    @GetMapping("/info/{id}")
-    public R info(@PathVariable("id") Long id){
-		PermissionEntity permission = permissionService.getById(id);
-
-        return R.ok().put("data", permission);
-    }
+//    @AccessLimit
+//    @GetMapping("/info/{id}")
+//    public R info(@PathVariable("id") Long id){
+//		PermissionEntity permission = permissionService.getById(id);
+//
+//        return R.ok().put("data", permission);
+//    }
 
     /**
      * 新增权限

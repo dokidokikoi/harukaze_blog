@@ -25,18 +25,40 @@ export const writeBlog = (data: IArticleParam) => {
   })
 }
 
-export const updateBlog = (params: IArticleParam) => {
+export const updateBlog = (data: IArticleParam) => {
   return request({
     method: 'PUT',
     url: 'article/update',
+    data
+  })
+}
+
+export const setBlogState = (params: {id: string, flag: boolean}) => {
+  return request({
+    method: 'PUT',
+    url: 'article/set_state',
     params
   })
 }
 
-export const setBlogState = (data: {id: string, flag: boolean}) => {
+export const fixedTop = (params: {id: string, weight: number}) => {
   return request({
     method: 'PUT',
-    url: 'article/set_state',
-    data
+    url: 'article/set_weight',
+    params
+  })
+}
+
+export const getArticleCount = () => {
+  return request<number>({
+    method: 'GET',
+    url: 'article/count'
+  })
+}
+
+export const getAllArticle = () => {
+  return request<IArticleDetail[]>({
+    method: 'GET',
+    url: 'article/all'
   })
 }

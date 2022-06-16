@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.harukaze.blog.app.core.annotation.LogAnnotation;
 import com.harukaze.blog.app.dao.ArticleDao;
+import com.harukaze.blog.app.dao.CommonDao;
 import com.harukaze.blog.app.entity.ArticleEntity;
 import com.harukaze.blog.app.entity.LogEntity;
 import com.harukaze.blog.app.handler.exception.ArticleUpdateCommentException;
@@ -52,6 +53,9 @@ public class ThreadServiceImpl implements ThreadService {
     @Autowired
     private UserAgentUtils userAgentUtils;
 
+    @Autowired
+    private CommonDao commonDao;
+
     private final int MAX_TRY = 10;
 
     @Override
@@ -88,14 +92,15 @@ public class ThreadServiceImpl implements ThreadService {
 
     @Override
     @Async("taskExecutor")
-    public void updateArticleCommentCountsById(Long articleId) {
+    public void updateArticleCommentCountsById(Long articleId, Integer cnt) {
         int count = 0;
 
         // 使用 cas 保证线程安全，自旋 MAX_TRY 次还未成功则抛出异常
         while (count++ < MAX_TRY) {
             int comment = articleDao.selectCommentCountById(articleId);
             ArticleEntity articleEntity = new ArticleEntity();
-            articleEntity.setCommentCounts(comment+1);
+            // 评论数加一或者减一
+            articleEntity.setCommentCounts(comment+cnt);
 
             int update = articleDao.update(articleEntity,
                     new LambdaQueryWrapper<ArticleEntity>()
@@ -139,12 +144,39 @@ public class ThreadServiceImpl implements ThreadService {
 //        }
 
         //获取request, 设置ip地址
-        logEntity.setIp(IpUtils.getIpAddrNum(request));
+        Long ipAddrNum = IpUtils.getIpAddrNum(request);
+        Long exist = commonDao.selectIp(ipAddrNum);
+        if (exist != null) {
+            logEntity.setIpId(exist);
+        } else {
+            commonDao.insertIp(ipAddrNum);
+            logEntity.setIpId(commonDao.selectIp(ipAddrNum));
+        }
+
         logEntity.setTime(time);
         logEntity.setAddress(IpUtils.getCityInfo(IpUtils.getIpAddr(request)));
         Map<String, String> map = userAgentUtils.parseOsAndBrowser(request.getHeader("User-Agent"));
-        logEntity.setOs(map.get(UserAgentUtils.OS));
-        logEntity.setBrowser(map.get(UserAgentUtils.BROWSER));
+
+        // 获取os
+        String os = map.get(UserAgentUtils.OS);
+        exist = commonDao.selectOs(os);
+        if (exist != null) {
+            logEntity.setOsId(exist);
+        } else {
+            commonDao.insertOs(os);
+            logEntity.setOsId(commonDao.selectIp(ipAddrNum));
+        }
+
+        // 获取浏览器
+        String browser = map.get(UserAgentUtils.BROWSER);
+        exist = commonDao.selectBrowser(browser);
+        if (exist != null) {
+            logEntity.setBrowserId(exist);
+        } else {
+            commonDao.insertBrowser(browser);
+            logEntity.setBrowserId(commonDao.selectBrowser(browser));
+        }
+
         logService.save(logEntity);
 
         log.info("=======================log============================");
@@ -155,9 +187,9 @@ public class ThreadServiceImpl implements ThreadService {
         String className = joinPoint.getTarget().getClass().getName();
         log.info("request method:{}",className+"."+logEntity.getMethod()+"()");
         log.info("params:{}",logEntity.getParams());
-        log.info("ip:{}", logEntity.getIp());
+        log.info("ip:{}", IpUtils.ipToString(ipAddrNum));
         log.info("excute time : {} ms", logEntity.getTime());
-        log.info("browser:{}", logEntity.getBrowser());
+        log.info("browser:{}", browser);
         log.info("=======================log end============================");
     }
 }

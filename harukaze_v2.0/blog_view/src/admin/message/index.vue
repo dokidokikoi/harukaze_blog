@@ -1,5 +1,5 @@
 <template>
-  <div>留言</div>
+  <app-comment />
 </template>
 
 <script lang="ts" setup>

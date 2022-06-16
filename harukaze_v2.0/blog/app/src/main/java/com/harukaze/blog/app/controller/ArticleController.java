@@ -1,10 +1,14 @@
 package com.harukaze.blog.app.controller;
 
+import java.util.List;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.harukaze.blog.app.core.annotation.AccessLimit;
+import com.harukaze.blog.app.core.annotation.CacheAnnotation;
 import com.harukaze.blog.app.core.annotation.HasPermission;
 import com.harukaze.blog.app.core.annotation.LogAnnotation;
+import com.harukaze.blog.app.entity.ArticleEntity;
 import com.harukaze.blog.app.param.ArticleParam;
 import com.harukaze.blog.app.vo.ArticleVo;
 import com.harukaze.blog.common.valid.AddGroup;
@@ -36,7 +40,7 @@ public class ArticleController {
      * 分页查询、条件查询
      * {
      * 	   "key": "summer",	// 文章标题关键字，标签名，分类名
-     *     "category": "1",	// 分类 id
+     *     "categoryId": "1",	// 分类 id
      *     "tags": [1, 3],		// 标签 id
      *     "limit": 10,		// 分页大小
      *     "page": 1,			// 当前页
@@ -55,13 +59,22 @@ public class ArticleController {
         return R.ok().put("data", page);
     }
 
+    @CacheAnnotation(cacheName = "allArticle")
+    @LogAnnotation(module = "文章", operator = "查询所有文章")
+    @GetMapping("/all")
+    public R getAll(){
+        List<ArticleVo> data = articleService.listAll();
+
+        return R.ok().put("data", data);
+    }
+
 
     /**
      * 查询文章详情
      */
     @LogAnnotation(module = "文章", operator = "查询文章详情")
     @GetMapping("/info/{id}")
-    public R info(@PathVariable("id") Long id){
+    public R info(@PathVariable("id") Long id) throws Exception {
         ArticleVo article = articleService.getArticleDetailById(id);
 
         return R.ok().put("data", article);
@@ -102,6 +115,22 @@ public class ArticleController {
     @PutMapping("/set_state")
     public R delete(Long id, boolean flag){
 		articleService.setArticleStateById(id, flag);
+
+        return R.ok();
+    }
+
+    /**
+     * 设置文章置顶
+     */
+    @LogAnnotation(module = "文章", operator = "设置文章置顶")
+    @HasPermission("article:update")
+    @AccessLimit
+    @PutMapping("/set_weight")
+    public R fixedTop(Long id, Integer weight){
+        articleService.update(null,
+                new LambdaUpdateWrapper<ArticleEntity>()
+                        .eq(ArticleEntity::getId, id)
+                        .set(ArticleEntity::getWeight, weight));
 
         return R.ok();
     }

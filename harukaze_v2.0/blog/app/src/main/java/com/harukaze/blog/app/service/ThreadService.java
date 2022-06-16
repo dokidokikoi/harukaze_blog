@@ -12,7 +12,7 @@ public interface ThreadService {
 
     void updateArticleViewCountById(Long id);
 
-    void updateArticleCommentCountsById(Long articleId);
+    void updateArticleCommentCountsById(Long articleId, Integer cnt);
 
     void recordLog(ProceedingJoinPoint joinPoint, Long time, HttpServletRequest request, UserVo userVo) throws IOException;
 }

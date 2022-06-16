@@ -31,5 +31,7 @@ public interface UserService extends IService<UserEntity> {
     UserVo getCurrentUser();
 
     void updateLastLogin(Long id);
+
+    void setRoles(Long id, Long[] ids);
 }
 

@@ -1,13 +1,18 @@
 <template>
   <el-dropdown>
     <span class="el-dropdown-link">
-      {{ $store.state.user?.user_info.nickname }}
-      <i class="el-icon-arrow-down el-icon--right" />
+      <!-- {{ $store.state.user?.user_info.nickname }} -->
+      <el-avatar
+        shape="square"
+        :size="35"
+        :src="$store.state.user?.user_info.avatar"
+      />
+      <el-icon><CaretBottom /></el-icon>
     </span>
     <template #dropdown>
       <el-dropdown-menu>
         <el-dropdown-item>个人中心</el-dropdown-item>
-        <el-dropdown-item @click="handleLogou">
+        <el-dropdown-item @click="handleLogout">
           退出登录
         </el-dropdown-item>
       </el-dropdown-menu>
@@ -24,7 +29,7 @@ import { useStore } from '@/store'
 const router = useRouter()
 const store = useStore()
 
-const handleLogou = () => {
+const handleLogout = () => {
   // 退出提示
   ElMessageBox.confirm('确认退出吗？', '退出提示', {
     confirmButtonText: '确定',

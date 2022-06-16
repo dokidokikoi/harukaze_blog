@@ -49,4 +49,9 @@ public class ArticleBodyEntity implements Serializable {
 	 */
 	private Long articleId;
 
+	/**
+	 * 文章目录
+	 */
+	private String catalog;
+
 }

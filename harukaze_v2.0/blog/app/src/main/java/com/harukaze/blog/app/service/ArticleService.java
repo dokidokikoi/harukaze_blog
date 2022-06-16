@@ -6,6 +6,7 @@ import com.harukaze.blog.app.vo.ArticleVo;
 import com.harukaze.blog.common.utils.PageUtils;
 import com.harukaze.blog.app.entity.ArticleEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,7 +22,7 @@ public interface ArticleService extends IService<ArticleEntity> {
 
     PageUtils listArticlePage(Map<String, Object> params);
 
-    ArticleVo getArticleDetailById(Long id);
+    ArticleVo getArticleDetailById(Long id) throws Exception;
 
     void saveArticleDetail(ArticleParam params);
 
@@ -30,5 +31,7 @@ public interface ArticleService extends IService<ArticleEntity> {
     void setArticleStateById(Long id, boolean flag);
 
     PageUtils getArticleArchives();
+
+    List<ArticleVo> listAll();
 }
 

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.harukaze.blog.app.entity.ArticleEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.harukaze.blog.app.vo.UserVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -28,7 +29,8 @@ public interface ArticleDao extends BaseMapper<ArticleEntity> {
                                            @Param("tags") List<Long> tags,
                                            @Param("time") String time,
                                            @Param("view") String view,
-                                           @Param("comment") String comment);
+                                           @Param("comment") String comment,
+                                           @Param("userVo") UserVo userVo);
 
     @Select("SELECT view_counts FROM hk_article WHERE id = #{id}")
     int selectViewCountById(@Param("id") Long id);

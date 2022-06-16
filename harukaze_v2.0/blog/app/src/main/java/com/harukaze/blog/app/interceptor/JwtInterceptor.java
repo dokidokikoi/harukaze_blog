@@ -51,16 +51,19 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
-        AccessLimit accessLimit = handlerMethod.getMethodAnnotation(AccessLimit.class);
+        AccessLimit accessLimit = null;
+        if (handler instanceof HandlerMethod) {
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+            accessLimit = handlerMethod.getMethodAnnotation(AccessLimit.class);
+        }
 
         //方法上有访问控制的注解
-        if (accessLimit != null) {
-            // ip 访问频率是否过高
-            if (!isBand(request, response, accessLimit)) {
-                return false;
-            }
-        }
+//        if (accessLimit != null) {
+//            // ip 访问频率是否过高
+//            if (!isBand(request, response, accessLimit)) {
+//                return false;
+//            }
+//        }
 
 
         // 验证登录
@@ -121,42 +124,6 @@ public class JwtInterceptor implements HandlerInterceptor {
                            ModelAndView modelAndView) throws Exception {
         UserThreadLocal.remove();
         System.out.println(UserThreadLocal.get());
-    }
-
-    // ip 访问某方法频率过高则屏蔽
-    private boolean isBand(HttpServletRequest request,
-                           HttpServletResponse response,
-                           AccessLimit accessLimit) throws IOException {
-
-        int seconds = accessLimit.seconds();
-        int maxCount = accessLimit.maxCount();
-        String ip = IpUtils.getIpAddr(request);
-        String method = request.getMethod();
-        String requestURI = request.getRequestURI();
-        String redisKey = ip + ":" + method + ":" + requestURI;
-        String countStr = (String) redisUtil.get(redisKey);
-
-
-        if (countStr == null) {
-            //在规定周期内第一次访问，存入redis
-            redisUtil.set(redisKey, "1", seconds);
-        } else {
-            int count = Integer.parseInt(countStr);
-            if (count >= maxCount) {
-                //超出访问限制次数
-                response.setContentType("application/json;charset=utf-8");
-                PrintWriter out = response.getWriter();
-                R r = R.error(ResponseStatus.USER_FORBIDDEN.getCode(), "访问频率过高");
-                out.write(JSONUtil.toJsonStr(r));
-                out.flush();
-                out.close();
-                return false;
-            } else {
-                //没超出访问限制次数
-                redisUtil.incr(redisKey, 1);
-            }
-        }
-        return true;
     }
 
 }

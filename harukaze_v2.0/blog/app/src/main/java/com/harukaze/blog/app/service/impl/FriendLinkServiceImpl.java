@@ -2,6 +2,7 @@ package com.harukaze.blog.app.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.harukaze.blog.common.constant.FriendLinkConstant;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -57,9 +58,10 @@ public class FriendLinkServiceImpl extends ServiceImpl<FriendLinkDao, FriendLink
 
     @Override
     public void updateLink(FriendLinkEntity param) {
-
-        param.setState(param.getState() == FriendLinkConstant.Status.ACTIVE.getCode() ?
-                param.getState() : FriendLinkConstant.Status.DOWN.getCode());
+        if (param.getState() != null) {
+            param.setState(param.getState() == FriendLinkConstant.Status.ACTIVE.getCode() ?
+                    param.getState() : FriendLinkConstant.Status.DOWN.getCode());
+        }
 
         param.setCreateDate(null);
 
@@ -71,6 +73,14 @@ public class FriendLinkServiceImpl extends ServiceImpl<FriendLinkDao, FriendLink
         FriendLinkEntity friendLinkEntity = new FriendLinkEntity();
         friendLinkEntity.setId(id);
         friendLinkEntity.setState(FriendLinkConstant.Status.DOWN.getCode());
+    }
+
+    @Override
+    public void setLinkState(Long id, boolean flag) {
+        this.baseMapper.update(null,
+                new LambdaUpdateWrapper<FriendLinkEntity>()
+                        .eq(FriendLinkEntity::getId, id).set(FriendLinkEntity::getState, flag ?
+                        FriendLinkConstant.Status.ACTIVE.getCode() : FriendLinkConstant.Status.DOWN.getCode()));
     }
 
 }

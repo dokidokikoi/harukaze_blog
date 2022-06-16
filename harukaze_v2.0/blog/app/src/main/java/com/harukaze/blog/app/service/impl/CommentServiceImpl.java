@@ -1,15 +1,21 @@
 package com.harukaze.blog.app.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.harukaze.blog.app.entity.ArticleEntity;
 import com.harukaze.blog.app.entity.UserEntity;
+import com.harukaze.blog.app.handler.exception.ArticleNotFoundException;
 import com.harukaze.blog.app.handler.exception.BlanckAuthorException;
 import com.harukaze.blog.app.param.CommentParam;
+import com.harukaze.blog.app.service.ArticleService;
 import com.harukaze.blog.app.service.ThreadService;
 import com.harukaze.blog.app.service.UserService;
 import com.harukaze.blog.app.util.UserThreadLocal;
 import com.harukaze.blog.app.vo.CommentVo;
 import com.harukaze.blog.app.vo.UserVo;
+import com.harukaze.blog.common.constant.ArticleConstant;
 import com.harukaze.blog.common.constant.CommentConstant;
+import com.harukaze.blog.common.constant.ResponseStatus;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +46,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
     @Autowired
     private ThreadService threadService;
 
+    @Autowired
+    private ArticleService articleService;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<CommentEntity> page = this.page(
@@ -52,14 +61,31 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
 
     // 根据文章id获取评论，首先获取顶端评论，再获取顶端评论的子评论
     @Override
-    public PageUtils listCommentPage(Long articleId,  Map<String, Object> params) {
+    public PageUtils listCommentPage(Long articleId,  Map<String, Object> params) throws ArticleNotFoundException {
+        LambdaQueryWrapper<CommentEntity> wrapper = new LambdaQueryWrapper<>();
+
+        // 是留言还是文章评论
+        if (articleId == 0) {
+            wrapper.isNull(CommentEntity::getArticleId);
+        } else {
+            wrapper.eq(CommentEntity::getArticleId, articleId);
+
+            // 未登录不将删除的文章的评论查出，删除的评论也不查出
+            if (UserThreadLocal.get() == null) {
+                wrapper.eq(CommentEntity::getState, CommentConstant.Status.ACTIVE.getCode());
+
+                if (articleService.getById(articleId).getState() == ArticleConstant.Status.DOWN.getCode()) {
+                    throw new ArticleNotFoundException(ResponseStatus.ARTICLE_NOT_FOUND.getMsg());
+                }
+            }
+        }
+        wrapper.eq(CommentEntity::getLevel, 1)
+                .orderByDesc(CommentEntity::getWeight);
+
         // 首先获取顶端评论
         IPage<CommentEntity> page = this.page(
                 new Query<CommentEntity>().getPage(params),
-                new LambdaQueryWrapper<CommentEntity>()
-                        .eq(CommentEntity::getArticleId, articleId)
-                        .eq(CommentEntity::getLevel, 1)
-                        .orderByDesc(CommentEntity::getWeight)
+                wrapper
         );
 
         PageUtils pageUtils = new PageUtils(page);
@@ -86,9 +112,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
         commentEntity.setState(CommentConstant.Status.ACTIVE.getCode());
         commentEntity.setWeight(1);
         if (commentEntity.getParentId() != null && commentEntity.getParentId() > 0) {
-            commentEntity.setLevel(1);
-        } else {
             commentEntity.setLevel(2);
+        } else {
+            commentEntity.setLevel(1);
         }
 
         // 如果用戶登录，将登录用户id存入评论作者id
@@ -117,7 +143,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
 
         // 考虑到可能是留言的情况，留言的 ArticleId 为空
         if (commentEntity.getArticleId() != null && commentEntity.getArticleId() > 0) {
-            threadService.updateArticleCommentCountsById(commentEntity.getArticleId());
+            threadService.updateArticleCommentCountsById(commentEntity.getArticleId(), 1);
         }
 
         this.baseMapper.insert(commentEntity);
@@ -137,11 +163,23 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
                     comment.getWeight() == CommentConstant.Status.ON_TOP.getCode() ?
                             comment.getWeight() : CommentConstant.Status.NAMAL.getCode());
         }
+
         if (comment.getState() != null) {
             // 是否为删除操作
             commentEntity.setState(
                     comment.getState() == CommentConstant.Status.DOWN.getCode() ?
                             comment.getState() : CommentConstant.Status.ACTIVE.getCode());
+            // 评论数
+            if (commentEntity.getArticleId() != null && commentEntity.getArticleId() > 0) {
+                // 评论数减一
+                if (comment.getState() == CommentConstant.Status.DOWN.getCode()) {
+                    threadService.updateArticleCommentCountsById(commentEntity.getArticleId(), -1);
+                }
+                // 评论数加一
+                if (comment.getState() == CommentConstant.Status.ACTIVE.getCode()) {
+                    threadService.updateArticleCommentCountsById(commentEntity.getArticleId(), 1);
+                }
+            }
         }
 
         commentEntity.setContent(comment.getContent());
@@ -159,10 +197,26 @@ public class CommentServiceImpl extends ServiceImpl<CommentDao, CommentEntity> i
         return this.baseMapper.selectCount(wrapper);
     }
 
+    @Override
+    public void setCommentState(Long id, boolean flag) {
+        if (id != null && id > 0) {
+            this.baseMapper.update(null,
+                    new LambdaUpdateWrapper<CommentEntity>()
+                            .eq(CommentEntity::getId, id)
+                            .set(CommentEntity::getState, flag ?
+                                    CommentConstant.Status.ACTIVE.getCode() : CommentConstant.Status.DOWN.getCode()));
+        }
+    }
+
     private List<CommentVo> findChildren(CommentEntity parent) {
-        List<CommentEntity> list = this.baseMapper.selectList(
-                new LambdaQueryWrapper<CommentEntity>()
-                        .eq(CommentEntity::getParentId, parent.getId()));
+        LambdaQueryWrapper<CommentEntity> wrapper = new LambdaQueryWrapper<CommentEntity>()
+                .eq(CommentEntity::getParentId, parent.getId())
+                .orderByDesc(CommentEntity::getCreateDate);
+        // 未登录的情况下，不将删除的评论查出
+        if (UserThreadLocal.get() == null) {
+            wrapper.eq(CommentEntity::getState, CommentConstant.Status.ACTIVE.getCode());
+        }
+        List<CommentEntity> list = this.baseMapper.selectList(wrapper);
 
         return list.stream().map(this::toVo).collect(Collectors.toList());
     }

@@ -1,6 +1,7 @@
 package com.harukaze.blog.app.handler;
 
 import com.harukaze.blog.app.handler.exception.ArticleException;
+import com.harukaze.blog.app.handler.exception.ArticleNotFoundException;
 import com.harukaze.blog.app.handler.exception.NotLoginException;
 import com.harukaze.blog.app.handler.exception.NotPermissionException;
 import com.harukaze.blog.common.constant.ResponseStatus;
@@ -33,8 +34,14 @@ public class GlobalExceptionHandler {
         return R.error(ResponseStatus.NOT_LOGIN.getCode(), ResponseStatus.NOT_LOGIN.getMsg());
     }
 
+    @ExceptionHandler(ArticleNotFoundException.class)
+    public R articleNotFound(ArticleNotFoundException e, HttpServletResponse resp) {
+        return R.error(ResponseStatus.ARTICLE_NOT_FOUND.getCode(), ResponseStatus.ARTICLE_NOT_FOUND.getMsg());
+    }
+
+
     @ExceptionHandler(ArticleException.class)
-    public R articleExceptionHandler(NotLoginException e, HttpServletResponse resp) {
+    public R articleExceptionHandler(ArticleException e, HttpServletResponse resp) {
         return R.error(ResponseStatus.ARTICLE_BAD_REQEST.getCode(), e.getMessage());
     }
 

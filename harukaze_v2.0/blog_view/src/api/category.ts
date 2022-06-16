@@ -10,19 +10,19 @@ export const getCategoryList = (params: ICommonParam) => {
   })
 }
 
-export const addCategory = (params: ICategory) => {
+export const addCategory = (data: ICategory) => {
   return request({
     method: 'POST',
     url: 'category/save',
-    params
+    data
   })
 }
 
-export const editCategory = (params: ICategory) => {
+export const editCategory = (data: ICategory) => {
   return request({
     method: 'PUT',
     url: 'category/update',
-    params
+    data
   })
 }
 
@@ -37,5 +37,12 @@ export const getCategoryData = () => {
   return request<ICategoryData[]>({
     method: 'GET',
     url: 'category/article'
+  })
+}
+
+export const getCategoryCount = () => {
+  return request<number>({
+    method: 'GET',
+    url: 'category/count'
   })
 }

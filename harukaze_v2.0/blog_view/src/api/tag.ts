@@ -10,25 +10,25 @@ export const getTagList = (params: ICommonParam) => {
   })
 }
 
-export const addTag = (params: ITag) => {
+export const addTag = (data: ITag) => {
   return request({
     method: 'POST',
     url: 'tag/save',
-    params
+    data
   })
 }
 
-export const editTag = (params: ITag) => {
+export const editTag = (data: ITag) => {
   return request({
     method: 'PUT',
     url: 'tag/update',
-    params
+    data
   })
 }
 
 export const delTag = (id: string) => {
   return request({
-    method: 'PUT',
+    method: 'DELETE',
     url: 'tag/delete/' + id
   })
 }
@@ -37,5 +37,12 @@ export const getTagData = () => {
   return request<ITagData[]>({
     method: 'GET',
     url: 'tag/articles'
+  })
+}
+
+export const getTagCount = () => {
+  return request<number>({
+    method: 'GET',
+    url: 'tag/count'
   })
 }

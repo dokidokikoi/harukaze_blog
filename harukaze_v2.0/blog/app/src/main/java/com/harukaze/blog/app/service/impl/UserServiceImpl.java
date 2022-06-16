@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.harukaze.blog.app.entity.PermissionEntity;
 import com.harukaze.blog.app.entity.RoleEntity;
+import com.harukaze.blog.app.entity.UserRoleEntity;
 import com.harukaze.blog.app.service.RolePermissionService;
 import com.harukaze.blog.app.service.RoleService;
 import com.harukaze.blog.app.service.UserRoleService;
@@ -30,6 +31,7 @@ import com.harukaze.blog.common.utils.Query;
 import com.harukaze.blog.app.dao.UserDao;
 import com.harukaze.blog.app.entity.UserEntity;
 import com.harukaze.blog.app.service.UserService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("userService")
@@ -43,6 +45,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RoleService roleService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -144,6 +149,28 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
                 new LambdaUpdateWrapper<UserEntity>()
                         .eq(UserEntity::getId, id)
                         .set(UserEntity::getLastLogin, System.currentTimeMillis()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void setRoles(Long id, Long[] ids) {
+
+        userRoleService.remove(
+                new LambdaQueryWrapper<UserRoleEntity>()
+                        .eq(UserRoleEntity::getUserId, id));
+
+        List<Long> collect = roleService.list().stream()
+                .map(RoleEntity::getId)
+                .collect(Collectors.toList());
+
+        for (Long aLong : ids) {
+            if (collect.contains(aLong)) {
+                UserRoleEntity userRoleEntity = new UserRoleEntity();
+                userRoleEntity.setUserId(id);
+                userRoleEntity.setRoleId(aLong);
+                userRoleService.save(userRoleEntity);
+            }
+        }
     }
 
 }

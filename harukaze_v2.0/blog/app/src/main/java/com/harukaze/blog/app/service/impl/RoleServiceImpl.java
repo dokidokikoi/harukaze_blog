@@ -2,11 +2,14 @@ package com.harukaze.blog.app.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.harukaze.blog.app.entity.PermissionEntity;
 import com.harukaze.blog.app.entity.RolePermissionEntity;
+import com.harukaze.blog.app.entity.UserRoleEntity;
 import com.harukaze.blog.app.param.RoleParam;
 import com.harukaze.blog.app.service.PermissionService;
 import com.harukaze.blog.app.service.RolePermissionService;
+import com.harukaze.blog.app.service.UserRoleService;
 import com.harukaze.blog.app.vo.RoleVo;
 import com.harukaze.blog.common.utils.R;
 import org.springframework.beans.BeanUtils;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -26,6 +30,7 @@ import com.harukaze.blog.common.utils.Query;
 import com.harukaze.blog.app.dao.RoleDao;
 import com.harukaze.blog.app.entity.RoleEntity;
 import com.harukaze.blog.app.service.RoleService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("roleService")
@@ -36,6 +41,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, RoleEntity> implements
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private UserRoleService userRoleService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -85,29 +93,71 @@ public class RoleServiceImpl extends ServiceImpl<RoleDao, RoleEntity> implements
         // 更新 role
         this.updateById(roleEntity);
 
-        // 先将角色权限全删除,再将存在的权限插入表
-        rolePermissionService.remove(
-                new LambdaQueryWrapper<RolePermissionEntity>()
-                        .eq(RolePermissionEntity::getRoleId, roleEntity.getId()));
-
-        // 考虑到本项目规模较小，直接将权限全部查出来，与传入的权限id作比较。
-        List<PermissionEntity> list = permissionService.list();
-        List<Long> idList = list.stream().map(PermissionEntity::getId).collect(Collectors.toList());
-
-        for (Long permissionId : param.getPermissions()) {
-            if (idList.contains(permissionId)) {
-                RolePermissionEntity rolePermissionEntity = new RolePermissionEntity();
-                rolePermissionEntity.setRoleId(param.getId());
-                rolePermissionEntity.setPermissionId(permissionId);
-                rolePermissionService.save(rolePermissionEntity);
-            }
-        }
+//        // 先将角色权限全删除,再将存在的权限插入表
+//        rolePermissionService.remove(
+//                new LambdaQueryWrapper<RolePermissionEntity>()
+//                        .eq(RolePermissionEntity::getRoleId, roleEntity.getId()));
+//
+//        // 考虑到本项目规模较小，直接将权限全部查出来，与传入的权限id作比较。
+//        List<PermissionEntity> list = permissionService.list();
+//        List<Long> idList = list.stream().map(PermissionEntity::getId).collect(Collectors.toList());
+//
+//        // 是否存在权限id不在权限表中的情况
+//        for (Long permissionId : param.getPermissions()) {
+//            if (idList.contains(permissionId)) {
+//                RolePermissionEntity rolePermissionEntity = new RolePermissionEntity();
+//                rolePermissionEntity.setRoleId(param.getId());
+//                rolePermissionEntity.setPermissionId(permissionId);
+//                rolePermissionService.save(rolePermissionEntity);
+//            }
+//        }
     }
 
     @Override
     public void saveRole(RoleEntity role) {
         role.setId(null);
         this.save(role);
+    }
+
+    @Override
+    public boolean removeRoleById(Long id) {
+        List<RolePermissionEntity> list = rolePermissionService.list(
+                new LambdaQueryWrapper<RolePermissionEntity>()
+                        .eq(RolePermissionEntity::getRoleId, id));
+        if (list == null || list.size() == 0) {
+            List<UserRoleEntity> list1 = userRoleService.list(
+                    new LambdaQueryWrapper<UserRoleEntity>()
+                            .eq(UserRoleEntity::getRoleId, id));
+            if (list1 == null || list1.size() == 0) {
+                this.removeById(id);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void setPermission(Long id, Long[] ids) {
+        List<Long> list = permissionService.list().stream()
+                .map(PermissionEntity::getId)
+                .collect(Collectors.toList());
+
+        // 先删除角色所有权限
+        rolePermissionService.remove(
+                new LambdaQueryWrapper<RolePermissionEntity>()
+                        .eq(RolePermissionEntity::getRoleId, id));
+
+        // 添加权限
+        for (Long item : ids) {
+            if (list.contains(item)) {
+                RolePermissionEntity rolePermissionEntity = new RolePermissionEntity();
+                rolePermissionEntity.setRoleId(id);
+                rolePermissionEntity.setPermissionId(item);
+                rolePermissionService.save(rolePermissionEntity);
+            }
+        }
     }
 
     private RoleVo toVo(RoleEntity roleEntity) {

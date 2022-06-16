@@ -1,27 +1,35 @@
 import request from '@/utils/request'
 import { IComment, ICommentParam, ICommentVo } from './types/comment'
-import { IPage, IResp } from './types/common'
+import { IPage } from './types/common'
 
 export const getCommentList = (id: string, params: any) => {
-  return request<IResp<IPage<ICommentVo>>>({
+  return request<IPage<ICommentVo>>({
     method: 'GET',
     url: 'comment/list/' + id,
     params
   })
 }
 
-export const postComment = (params: ICommentParam) => {
+export const postComment = (data: ICommentParam) => {
   return request({
     method: 'POST',
     url: 'comment/save',
-    params
+    data
   })
 }
 
-export const editComment = (params: IComment) => {
+export const editComment = (data: IComment) => {
   return request({
     method: 'PUT',
     url: 'comment/update',
+    data
+  })
+}
+
+export const setCommentState = (params: {id: string, flag: boolean}) => {
+  return request({
+    method: 'PUT',
+    url: 'comment/set_state',
     params
   })
 }

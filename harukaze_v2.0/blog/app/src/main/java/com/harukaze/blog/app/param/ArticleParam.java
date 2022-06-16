@@ -58,9 +58,9 @@ public class ArticleParam {
      */
     @NotNull(message = "修改，category不能为空", groups = UpdateGroup.class)
     @NotNull(message = "新增，category不能为空", groups = AddGroup.class)
-    private CategoryEntity category;
+    private Long categoryId;
 
     @NotNull(message = "修改，id不能为空", groups = UpdateGroup.class)
     @NotNull(message = "新增，tags不能为空", groups = AddGroup.class)
-    private List<TagEntity> tags;
+    private List<Long> tags;
 }

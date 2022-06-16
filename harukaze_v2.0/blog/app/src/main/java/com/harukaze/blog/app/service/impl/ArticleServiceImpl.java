@@ -5,11 +5,15 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.harukaze.blog.app.entity.*;
 import com.harukaze.blog.app.handler.exception.ArticleException;
+import com.harukaze.blog.app.handler.exception.ArticleNotFoundException;
 import com.harukaze.blog.app.param.ArticleParam;
 import com.harukaze.blog.app.service.*;
 import com.harukaze.blog.app.util.UserThreadLocal;
 import com.harukaze.blog.app.vo.ArticleVo;
 import com.harukaze.blog.common.constant.ArticleConstant;
+import com.harukaze.blog.common.constant.ResponseStatus;
+import com.harukaze.blog.common.utils.R;
+import com.harukaze.blog.common.utils.RedisUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,6 +53,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, ArticleEntity> i
 
     @Autowired
     private ThreadService threadService;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -95,7 +102,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, ArticleEntity> i
 
         Page<ArticleEntity> page = new Page<>(currt, limit);
         IPage<ArticleEntity> IPage = this.baseMapper.selectArticleList(
-                page, key, categoryId, tags, time, view, comment);
+                page, key, categoryId, tags, time, view, comment, UserThreadLocal.get());
 
         // 将数据库实体类转换成前端交互数据
         PageUtils pageUtils = new PageUtils(IPage);
@@ -109,8 +116,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, ArticleEntity> i
     }
 
     @Override
-    public ArticleVo getArticleDetailById(Long id) {
+    public ArticleVo getArticleDetailById(Long id) throws Exception {
         ArticleEntity articleEntity = this.baseMapper.selectById(id);
+        if (articleEntity.getState() == ArticleConstant.Status.DOWN.getCode() && UserThreadLocal.get() == null) {
+            throw new ArticleException("找不到该文章");
+        }
         threadService.updateArticleViewCountById(id);
         return toVo(articleEntity, true);
     }
@@ -124,7 +134,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, ArticleEntity> i
 
         // 先处理 article 的前面部分操作，之后将 category 和 body 存储在数据库后，再一次性将 article 存入数据库。
         // 最后将 tags 存入数据库
-        // 注意：这里 tags 和 category 可能是新增的
         BeanUtils.copyProperties(params, articleEntity);
         articleEntity.setId(null);
         articleEntity.setCreateDate(System.currentTimeMillis());
@@ -132,10 +141,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, ArticleEntity> i
         articleEntity.setCommentCounts(0);
         articleEntity.setViewCounts(0);
         articleEntity.setState(ArticleConstant.Status.ACTIVE.getCode());
+        articleEntity.setCategoryId(params.getCategoryId());
 
         articleBodyEntity.setId(null);
         articleBodyEntity.setContent(params.getBody().getContent());
         articleBodyEntity.setContentHtml(params.getBody().getContentHtml());
+        articleBodyEntity.setCatalog(params.getBody().getCatalog());
 
         // 将 body 存入数据库
         articleBodyService.save(articleBodyEntity);
@@ -143,19 +154,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, ArticleEntity> i
         // article 设置 body id
         articleEntity.setBodyId(articleBodyEntity.getId());
 
-        // 判断是否为新增 category
-        if (params.getCategory().getId() != null && params.getCategory().getId() != 0) {
-            articleEntity.setCategoryId(params.getCategory().getId());
-        } else {
-            categoryEntity.setId(null);
-            categoryEntity.setCategoryDesc(params.getCategory().getCategoryDesc());
-            categoryEntity.setCategoryName(params.getCategory().getCategoryName());
-            categoryEntity.setAvatar(params.getCategory().getAvatar());
-
-            // 将 category 存入数据库
-            categoryService.save(categoryEntity);
-            articleEntity.setCategoryId(categoryEntity.getId());
-        }
         // 将 article 存入数据库
         this.baseMapper.insert(articleEntity);
 
@@ -168,6 +166,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, ArticleEntity> i
         // article 与 tags 的关系保存到数据库
         this.addArticleTag(articleEntity.getId(), params.getTags());
 
+        // 将缓存中的文章数据删除
+        redisUtil.del("cache_allArticle");
     }
 
     @Override
@@ -180,26 +180,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, ArticleEntity> i
         articleEntity.setCreateDate(null);
         articleEntity.setUpdateDate(System.currentTimeMillis());
         articleEntity.setBodyId(params.getBody().getId());
-
-        if (params.getCategory().getId() != null && params.getCategory().getId() > 0) {
-            articleEntity.setCategoryId(params.getCategory().getId());
-        } else {
-            CategoryEntity categoryEntity = new CategoryEntity();
-            categoryEntity.setCategoryName(params.getCategory().getCategoryName());
-            categoryEntity.setCategoryDesc(params.getCategory().getCategoryDesc());
-            categoryEntity.setAvatar(params.getCategory().getAvatar());
-
-            categoryService.save(categoryEntity);
-            articleEntity.setCategoryId(categoryEntity.getId());
-        }
+        articleEntity.setCategoryId(params.getCategoryId());
 
         this.baseMapper.updateById(articleEntity);
 
         // 更新 body
-        ArticleBodyEntity articleBodyEntity = new ArticleBodyEntity();
-        BeanUtils.copyProperties(params.getBody(), articleBodyEntity);
-        articleBodyEntity.setArticleId(null);
-        articleBodyService.updateById(articleBodyEntity);
+        params.getBody().setArticleId(null);
+        articleBodyService.updateById(params.getBody());
 
         // 将 article 和 tag 的关联全部删除
         articleTagService.delTagByArticleId(articleEntity.getId());
@@ -223,6 +210,21 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, ArticleEntity> i
         return null;
     }
 
+    @Override
+    public List<ArticleVo> listAll() {
+        LambdaQueryWrapper<ArticleEntity> wrapper = new LambdaQueryWrapper<>();
+
+        if (UserThreadLocal.get() == null) {
+            wrapper.eq(ArticleEntity::getState, ArticleConstant.Status.ACTIVE.getCode());
+        }
+
+        wrapper.orderByDesc(ArticleEntity::getCreateDate);
+
+        return this.list(wrapper).stream()
+                .map(item -> toVo(item, true))
+                .collect(Collectors.toList());
+    }
+
     // 将数据库实体类转换成前端交互数据
     private ArticleVo toVo(ArticleEntity articleEntity, boolean needBody) {
         ArticleVo articleVo = new ArticleVo();
@@ -244,23 +246,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, ArticleEntity> i
     }
 
     // 标签列表和文章建立联系
-    private void addArticleTag(Long articleId, List<TagEntity> tags) {
-        // 判断 tags 中是否有新增
+    private void addArticleTag(Long articleId, List<Long> tags) {
+
         tags.forEach(item -> {
-            TagEntity tagEntity = new TagEntity();
             ArticleTagEntity articleTagEntity = new ArticleTagEntity();
 
             articleTagEntity.setArticleId(articleId);
+            articleTagEntity.setTagId(item);
 
-            if (item.getId() != null && item.getId() > 0) {
-                articleTagEntity.setTagId(item.getId());
-            } else {
-                tagEntity.setTagName(item.getTagName());
-                tagService.save(tagEntity);
-
-                // 将新增 tag 存入数据库
-                articleTagEntity.setTagId(tagEntity.getId());
-            }
             // 将 tag 和 article 关系存入数据库
             articleTagService.save(articleTagEntity);
         });

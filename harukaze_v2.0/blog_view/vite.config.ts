@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 // import vueJsx from '@vitejs/plugin-vue-jsx'
 // import { viteMockServe } from 'vite-plugin-mock'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import prismjs from 'vite-plugin-prismjs'
 const path = require('path')
 
 // https://vitejs.dev/config/
@@ -20,6 +21,9 @@ export default defineConfig({
       // 配置路劲在你的src里的svg存放文件
       iconDirs: [path.resolve(process.cwd(), 'src/icons')],
       symbolId: 'icon-[dir]-[name]'
+    }),
+    prismjs({
+      languages: ['json']
     })
   ],
   resolve: {
